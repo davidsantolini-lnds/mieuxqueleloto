@@ -313,7 +313,11 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
   let bestScore = 0;
   for (const i of candidates) {
     const base = idx.bases[i];
-    const s = scoreBase(tokens, inputNorm, base);
+    // Léger handicap pour le registre absurde : à match comparable, une vraie
+    // activité (loto, crypto, métier, télé…) prime sur sa vanne homonyme.
+    // L'absurde ne gagne que s'il matche nettement mieux la requête.
+    const weight = base.entry.category === "absurde" ? 0.9 : 1;
+    const s = scoreBase(tokens, inputNorm, base) * weight;
     if (s > bestScore) {
       bestScore = s;
       best = base;

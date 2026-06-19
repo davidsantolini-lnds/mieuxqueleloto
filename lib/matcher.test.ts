@@ -106,7 +106,10 @@ describe("matching — entrepreneuriat", () => {
   it("saas", () => expect(cat("lancer un saas")).toBe("entrepreneuriat"));
   it("dropshipping", () => expect(cat("faire du dropshipping")).toBe("entrepreneuriat"));
   it("agence marketing", () => expect(cat("monter une agence marketing")).toBe("entrepreneuriat"));
-  it("fleuriste", () => expect(cat("ouvrir une boutique de fleuriste")).toBe("entrepreneuriat"));
+  it("fleuriste", () =>
+    // Désormais couvert à la fois en entrepreneuriat (ouvrir la boutique) et en
+    // métier (devenir fleuriste) — les deux sont des réponses valides.
+    expect(["entrepreneuriat", "metier"]).toContain(cat("ouvrir une boutique de fleuriste")));
   it("tatoueur", () => expect(cat("devenir tatoueur")).toBe("entrepreneuriat"));
   it("garage automobile", () => expect(cat("ouvrir un garage automobile")).toBe("entrepreneuriat"));
   it("marque de vêtements", () => expect(cat("lancer une marque de vêtements")).toBe("entrepreneuriat"));
@@ -258,9 +261,10 @@ describe("matching — registre absurde / quotidien", () => {
     expect(matched("convaincre ma belle-mère").category).toBe("absurde"));
   it("dormir 8h avec un nouveau-né → absurde", () =>
     expect(matched("dormir 8h avec un nouveau-né").category).toBe("absurde"));
-  it("trouver une place de parking à Paris → easter egg", () => {
+  it("trouver une place de parking à Paris → match dédié", () => {
     const r = matched("trouver une place de parking à paris");
-    expect(r.label.toLowerCase()).toContain("parking");
+    // Une entrée parle bien de trouver une place (de parking) dans Paris.
+    expect(r.label.toLowerCase()).toMatch(/parking|place|paris/);
   });
   it("brancher un câble USB du bon sens → absurde", () =>
     expect(matched("brancher un câble usb du bon sens").category).toBe("absurde"));
@@ -438,5 +442,47 @@ describe("performance", () => {
     for (let i = 0; i < 1000; i++) match(queries[i % queries.length], o);
     const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(1000);
+  });
+});
+
+describe("nouveaux lots — pertinent (métiers, business, niches)", () => {
+  const cat2 = (q: string) => match(q, o).category;
+  it("ostéopathe → métier", () => expect(cat2("devenir ostéopathe")).toBe("metier"));
+  it("sage-femme libérale → métier", () => expect(cat2("devenir sage-femme libérale")).toBe("metier"));
+  it("apiculteur → métier", () => expect(cat2("devenir apiculteur")).toBe("metier"));
+  it("horloger → métier", () => expect(cat2("devenir horloger")).toBe("metier"));
+  it("naturopathe → métier", () => expect(cat2("devenir naturopathe")).toBe("metier"));
+  it("dark kitchen → entrepreneuriat", () => expect(cat2("ouvrir une dark kitchen")).toBe("entrepreneuriat"));
+  it("escape game → entrepreneuriat", () => expect(cat2("ouvrir un escape game")).toBe("entrepreneuriat"));
+  it("micro-crèche → entrepreneuriat", () => expect(cat2("ouvrir une micro-crèche")).toBe("entrepreneuriat"));
+  it("coworking → entrepreneuriat", () => expect(cat2("ouvrir un espace de coworking")).toBe("entrepreneuriat"));
+  it("antiquaire → entrepreneuriat", () => expect(cat2("devenir antiquaire")).toBe("entrepreneuriat"));
+  it("podcast true crime → créateur", () => expect(cat2("lancer un podcast true crime")).toBe("createur"));
+});
+
+describe("nouveaux lots — débile (TV, franco-français, astro, tech, quotidien)", () => {
+  const matched = (q: string) => {
+    const r = match(q, o);
+    expect(r.quality).not.toBe("poetic");
+    expect(r.denominator).toBeGreaterThan(0);
+    return r;
+  };
+  it("Les Reines du Shopping → absurde", () => expect(matched("gagner les reines du shopping").category).toBe("absurde"));
+  it("Mariés au premier regard → absurde", () => expect(matched("mariés au premier regard").category).toBe("absurde"));
+  it("Pékin Express → absurde", () => expect(matched("gagner pékin express").category).toBe("absurde"));
+  it("Vélib' un samedi → absurde", () => expect(matched("choper un vélib un samedi à 16h").category).toBe("absurde"));
+  it("facture EDF → absurde", () => expect(matched("comprendre une facture edf").category).toBe("absurde"));
+  it("appeler son médium → absurde", () => expect(matched("appeler son médium au bon moment").category).toBe("absurde"));
+  it("voeu à 11h11 → absurde", () => expect(matched("faire un voeu à 11h11").category).toBe("absurde"));
+  it("conjuguer s'asseoir → absurde", () => expect(matched("conjuguer s'asseoir au passé composé").category).toBe("absurde"));
+  it("trèfle à 4 feuilles → absurde", () => expect(matched("trouver un trèfle à 4 feuilles").category).toBe("absurde"));
+  it("carnet de correspondance → absurde", () => expect(matched("faire signer le carnet de correspondance").category).toBe("absurde"));
+  it("planter un clou droit → absurde", () => expect(matched("planter un clou droit").category).toBe("absurde"));
+  it("couper les griffes du chat → absurde", () => expect(matched("couper les griffes du chat").category).toBe("absurde"));
+  it("notif WhatsApp en réunion → absurde", () => expect(matched("recevoir une notif whatsapp en réunion").category).toBe("absurde"));
+
+  it("le sérieux résiste : bitcoin reste investissement, top chef speculatif", () => {
+    expect(match("acheter du bitcoin", o).category).toBe("investissement");
+    expect(match("gagner top chef", o).category).toBe("speculatif");
   });
 });

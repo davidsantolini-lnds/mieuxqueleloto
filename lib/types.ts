@@ -36,9 +36,7 @@ export type CatalogEntry = {
   label: string;
   /** Mots-clés normalisés/normalisables servant au matching. */
   keywords: string[];
-  /** Numérateur de la probabilité (presque toujours 1). */
-  oddsNumerator: number;
-  /** Dénominateur : « 1 chance sur N ». */
+  /** Dénominateur : « 1 chance sur N » (le numérateur est toujours 1). */
   oddsDenominator: number;
   category: Category;
   /** Référence publique (INSEE, BPI, Forbes, étude…). */

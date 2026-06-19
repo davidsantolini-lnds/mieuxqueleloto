@@ -67,30 +67,50 @@ export default function Comparator() {
     run(query);
   }
 
+  // Vide le champ et garde le focus (comportement type champ de recherche iOS).
+  function clearInput() {
+    setQuery("");
+    inputRef.current?.focus();
+  }
+
   return (
     <div className="w-full">
       <form onSubmit={onSubmit} className="mx-auto w-full max-w-xl">
-        <div className="glass flex flex-col gap-3 rounded-3xl p-3 sm:flex-row sm:items-center sm:p-2.5">
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Ex : ${PLACEHOLDERS[placeholderIdx]}…`}
-            aria-label="Décris ton activité"
-            className="w-full flex-1 rounded-2xl bg-white/60 px-5 py-4 text-lg text-ink outline-none placeholder:text-muted/70 focus:bg-white/90"
-          />
+        <div className="glass flex flex-col gap-2.5 rounded-3xl p-2.5 sm:flex-row sm:items-center">
+          <div className="relative w-full flex-1">
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`Ex : ${PLACEHOLDERS[placeholderIdx]}…`}
+              aria-label="Décris ton activité"
+              className="w-full rounded-2xl bg-white/60 py-3.5 pl-5 pr-12 text-lg text-ink outline-none placeholder:text-muted/70 focus:bg-white/90"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={clearInput}
+                aria-label="Effacer le champ"
+                className="absolute right-2 top-1/2 flex h-[30px] w-[30px] -translate-y-1/2 items-center justify-center rounded-full text-muted transition hover:text-ink"
+              >
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ink/25 text-[13px] font-bold leading-none text-white">
+                  ✕
+                </span>
+              </button>
+            )}
+          </div>
           <button
             type="submit"
-            className="brand-bg rounded-2xl px-7 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-95"
+            className="brand-bg rounded-2xl px-7 py-3.5 text-lg font-bold text-white shadow-lg transition hover:brightness-105 active:scale-95"
           >
             Comparer
           </button>
         </div>
       </form>
 
-      {/* Exemples cliquables */}
-      <div className="mx-auto mt-4 flex max-w-xl flex-wrap justify-center gap-2">
+      {/* Exemples cliquables — compacts, 2 lignes max sur mobile */}
+      <div className="mx-auto mt-3 flex max-w-xl flex-wrap justify-center gap-1.5">
         {EXAMPLES.map((ex) => (
           <button
             key={ex}
@@ -98,7 +118,7 @@ export default function Comparator() {
               setQuery(ex);
               run(ex);
             }}
-            className="rounded-full border border-ink/10 bg-white/50 px-3 py-1.5 text-sm text-muted transition hover:bg-white/80 hover:text-ink"
+            className="rounded-full border border-ink/10 bg-white/50 px-2.5 py-1 text-xs text-muted transition hover:bg-white/80 hover:text-ink sm:text-sm"
           >
             {ex}
           </button>

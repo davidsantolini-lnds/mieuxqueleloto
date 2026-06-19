@@ -8,19 +8,19 @@ const EFFECTIVE_PRETTY = effectiveCount().toLocaleString("fr-FR");
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center px-4 pb-28 pt-12 md:pt-20">
+    <main className="flex flex-1 flex-col items-center px-4 pb-20 pt-6 sm:pt-12 md:pt-16">
       {/* Hero */}
       <section className="animate-fade-up w-full max-w-2xl text-center">
-        <span className="inline-block rounded-full border border-ink/10 bg-white/50 px-4 py-1.5 text-xs font-semibold tracking-wide text-muted">
+        <span className="inline-block rounded-full border border-ink/10 bg-white/50 px-3 py-1 text-[11px] font-semibold tracking-wide text-muted sm:px-4 sm:py-1.5 sm:text-xs">
           🎰 {EFFECTIVE_PRETTY} activités comparées
         </span>
 
-        <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
+        <h1 className="mt-3 text-[2rem] font-extrabold leading-[1.06] tracking-tight sm:mt-5 sm:text-4xl md:text-6xl">
           Vaut mieux faire <span className="brand-text">ça</span>
           <br className="hidden sm:block" /> ou jouer au Loto ?
         </h1>
 
-        <p className="mx-auto mt-5 max-w-lg text-lg text-muted">
+        <p className="mx-auto mt-3 max-w-lg text-base text-muted sm:mt-5 sm:text-lg">
           Tape une activité. On calcule tes vraies chances de devenir{" "}
           <strong className="text-ink">millionnaire</strong>, et on les compare
           au Loto + MyMillion&nbsp;
@@ -32,12 +32,12 @@ export default function Home() {
       </section>
 
       {/* Champ + résultat */}
-      <section className="mt-9 w-full">
+      <section className="mt-5 w-full sm:mt-8">
         <Comparator />
       </section>
 
       {/* Footer ultra-minimal — aucun détail sur le fonctionnement interne. */}
-      <footer className="mt-auto w-full px-2 pt-16 text-center text-[11px] text-muted/70">
+      <footer className="mt-auto w-full px-2 pt-10 text-center text-[11px] text-muted/70 sm:pt-16">
         © 2026 — Mieux que le Loto&nbsp;?
       </footer>
     </main>
