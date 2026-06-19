@@ -1,15 +1,12 @@
 import Comparator from "@/components/Comparator";
-import { BASE_COUNT, effectiveCount } from "@/lib/expander";
+import { effectiveCount } from "@/lib/expander";
+import { BASELINE_DENOMINATOR } from "@/lib/types";
 
-const LOTO_PRETTY = (19_068_840).toLocaleString("fr-FR");
+const BASELINE_PRETTY = BASELINE_DENOMINATOR.toLocaleString("fr-FR");
 // Compteur calculé dynamiquement depuis l'espace combinatoire de l'expander.
-const EFFECTIVE = effectiveCount();
-const EFFECTIVE_PRETTY = EFFECTIVE.toLocaleString("fr-FR");
+const EFFECTIVE_PRETTY = effectiveCount().toLocaleString("fr-FR");
 
 export default function Home() {
-  const baseCount = BASE_COUNT;
-  const effective = EFFECTIVE;
-
   return (
     <main className="flex flex-1 flex-col items-center px-4 pb-28 pt-12 md:pt-20">
       {/* Hero */}
@@ -26,9 +23,9 @@ export default function Home() {
         <p className="mx-auto mt-5 max-w-lg text-lg text-muted">
           Tape une activité. On calcule tes vraies chances de devenir{" "}
           <strong className="text-ink">millionnaire</strong>, et on les compare
-          au Loto&nbsp;
+          au Loto + MyMillion&nbsp;
           <span className="whitespace-nowrap">
-            (1 chance sur {LOTO_PRETTY})
+            (1 chance sur {BASELINE_PRETTY})
           </span>
           .
         </p>
@@ -39,18 +36,9 @@ export default function Home() {
         <Comparator />
       </section>
 
-      {/* Footer minimal */}
-      <footer className="mt-auto w-full max-w-2xl px-2 pt-16 text-center text-xs text-muted">
-        <p>
-          {baseCount} activités de base hand-curatées, étendues à{" "}
-          {effective.toLocaleString("fr-FR")} combinaisons générées à la volée
-          (lieu, spécialisation, échelle, format, stade). Probabilités sourcées
-          ou estimées honnêtement — à prendre avec humour, pas comme un conseil
-          financier.
-        </p>
-        <p className="mt-2">
-          Fait avec 🎰 pour rappeler qu'à peu près tout est mieux que le Loto.
-        </p>
+      {/* Footer ultra-minimal — aucun détail sur le fonctionnement interne. */}
+      <footer className="mt-auto w-full px-2 pt-16 text-center text-[11px] text-muted/70">
+        © 2026 — Mieux que le Loto&nbsp;?
       </footer>
     </main>
   );

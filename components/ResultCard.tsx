@@ -1,7 +1,7 @@
 "use client";
 
 import type { MatchResult } from "@/lib/types";
-import { LOTO_DENOMINATOR } from "@/lib/types";
+import { BASELINE_DENOMINATOR } from "@/lib/types";
 import { formatOdds, formatRatio } from "@/lib/format";
 import ShareButtons from "./ShareButtons";
 
@@ -19,9 +19,7 @@ function logFill(denominator: number): number {
   return Math.max(3, Math.min(100, pct));
 }
 
-function lotoFill() {
-  return logFill(LOTO_DENOMINATOR);
-}
+const baselineFill = logFill(BASELINE_DENOMINATOR);
 
 export default function ResultCard({
   result,
@@ -33,16 +31,15 @@ export default function ResultCard({
   const isPoetic = result.quality === "poetic";
   const fill = logFill(result.denominator);
   const better = result.ratioVsLoto >= 1;
+  // On ne montre du texte que pour la mauvaise foi ou le fallback poétique :
+  // un résultat normal s'ouvre directement sur les chiffres (effet « magique »).
+  const showMessage = result.badFaith || isPoetic;
 
   return (
     <div className="animate-reveal glass mx-auto mt-8 w-full max-w-xl rounded-3xl p-6 md:p-8">
-      <p className="text-sm font-medium text-muted">
-        {isPoetic ? "Verdict" : `Devenir millionnaire en : ${result.label}`}
-      </p>
-
       {!isPoetic && (
-        <div className="mt-3">
-          <div className="text-3xl font-extrabold leading-tight md:text-4xl">
+        <div>
+          <div className="text-4xl font-extrabold leading-tight md:text-5xl">
             <span className="brand-text">{formatOdds(result.denominator)}</span>
           </div>
           <p
@@ -55,10 +52,11 @@ export default function ResultCard({
         </div>
       )}
 
-      {/* Phrase / message (peut être de la mauvaise foi) */}
-      <p className="mt-4 text-base leading-relaxed text-ink/90">
-        {result.message}
-      </p>
+      {showMessage && (
+        <p className="mt-4 text-base leading-relaxed text-ink/90">
+          {result.message}
+        </p>
+      )}
 
       {result.badFaith && (
         <span className="mt-2 inline-block rounded-full bg-pink/15 px-3 py-1 text-xs font-semibold text-pink">
@@ -66,11 +64,7 @@ export default function ResultCard({
         </span>
       )}
 
-      {result.disclaimer && (
-        <p className="mt-3 text-xs italic text-muted">{result.disclaimer}</p>
-      )}
-
-      {/* Barre log : ton activité vs le Loto */}
+      {/* Barre log : ton activité vs Loto + MyMillion */}
       {!isPoetic && (
         <div className="mt-6">
           <div className="relative h-4 w-full overflow-hidden rounded-full bg-ink/10">
@@ -78,31 +72,19 @@ export default function ResultCard({
               className="animate-bar brand-bg h-full rounded-full"
               style={{ width: `${fill}%` }}
             />
-            {/* Repère Loto */}
+            {/* Repère Loto + MyMillion */}
             <div
               className="absolute top-1/2 h-5 w-[3px] -translate-y-1/2 rounded bg-ink/60"
-              style={{ left: `calc(${lotoFill()}% - 1.5px)` }}
-              title="Niveau du Loto"
+              style={{ left: `calc(${baselineFill}% - 1.5px)` }}
+              title="Niveau du Loto + MyMillion"
             />
           </div>
           <div className="mt-1 flex justify-between text-[11px] text-muted">
             <span>impossible</span>
-            <span>↑ Loto</span>
+            <span>↑ Loto + MyMillion</span>
             <span>quasi sûr</span>
           </div>
         </div>
-      )}
-
-      {result.source && (
-        <p className="mt-4 text-[11px] text-muted">
-          Source / base d'estimation : {result.source}
-          {result.estimate ? " · estimation" : ""}
-        </p>
-      )}
-      {!result.source && result.estimate && !isPoetic && (
-        <p className="mt-4 text-[11px] text-muted">
-          Estimation honnête (pas de stat publique parfaite pour ça).
-        </p>
       )}
 
       <ShareButtons result={result} query={query} />

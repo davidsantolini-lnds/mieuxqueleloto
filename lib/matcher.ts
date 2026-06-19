@@ -1,5 +1,5 @@
 import type { Axis, Category, CatalogEntry, MatchResult } from "./types";
-import { LOTO_DENOMINATOR } from "./types";
+import { BASELINE_DENOMINATOR } from "./types";
 import { CATALOG } from "./catalog";
 import { AXES, AXIS_ORDER, applyModulators, type Modulator } from "./expander";
 import {
@@ -37,6 +37,7 @@ const STOP_WORDS = new Set([
 
 const GENERIC_WEIGHT_WORDS = new Set([
   "ouvrir", "lancer", "creer", "monter", "devenir", "faire", "gagner", "vivre",
+  "tenir", "obtenir", "reussir", "trouver", "arriver", "garder",
   "etre", "avoir", "tenter", "essayer", "idee", "projet", "activite", "travail",
   "job", "metier", "argent", "riche", "millionnaire", "million", "fortune",
   "reussir", "percer", "gens", "vendre", "carriere", "profession",
@@ -327,7 +328,7 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
     const label = labels.length
       ? `${entry.label} (${labels.join(", ")})`
       : entry.label;
-    const ratioVsLoto = LOTO_DENOMINATOR / denominator;
+    const ratioVsLoto = BASELINE_DENOMINATOR / denominator;
     const quality = bestScore >= STRONG_THRESHOLD ? "strong" : "weak";
 
     return finalize({
@@ -352,7 +353,7 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
   const category = classifyCategory(inputNorm) ?? classifyCategory(input);
   if (category) {
     const denominator = geometricMeanDenominator(category);
-    const ratioVsLoto = LOTO_DENOMINATOR / denominator;
+    const ratioVsLoto = BASELINE_DENOMINATOR / denominator;
     return finalize({
       denominator,
       ratioVsLoto,

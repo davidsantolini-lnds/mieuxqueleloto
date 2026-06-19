@@ -8,7 +8,8 @@ export type Category =
   | "artiste"
   | "sport"
   | "metier"
-  | "speculatif";
+  | "speculatif"
+  | "absurde";
 
 /**
  * Axes d'expansion. Chaque entrée déclare les axes qui lui sont *cohérents*
@@ -39,6 +40,14 @@ export type CatalogEntry = {
 
 export const LOTO_DENOMINATOR = 19_068_840; // 1 chance sur 19 068 840 — FDJ Loto
 export const EUROMILLIONS_DENOMINATOR = 139_838_160; // 1 chance — EuroMillions
+export const MYMILLION_DENOMINATOR = 5_000_000; // 1 chance — code MyMillion (FDJ)
+
+// Nouveau baseline de comparaison : Loto OU MyMillion (les deux à la fois).
+// 1 / (1/19068840 + 1/5000000) ≈ 1 chance sur 3 961 313.
+export const BASELINE_DENOMINATOR = Math.round(
+  1 / (1 / LOTO_DENOMINATOR + 1 / MYMILLION_DENOMINATOR),
+);
+export const BASELINE_LABEL = "Loto + MyMillion";
 
 export type MatchQuality = "strong" | "weak" | "category" | "poetic";
 

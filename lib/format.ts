@@ -9,9 +9,10 @@ export function formatOdds(denominator: number): string {
   return `1 chance sur ${rounded.toLocaleString("fr-FR")}`;
 }
 
-export function formatRatio(ratioVsLoto: number): string {
-  if (ratioVsLoto >= 1) {
-    return `${Math.round(ratioVsLoto).toLocaleString("fr-FR")}× plus de chances qu'au Loto`;
+export function formatRatio(ratio: number): string {
+  // `ratio` = chances comparées au baseline Loto + MyMillion.
+  if (ratio >= 1) {
+    return `${Math.round(ratio).toLocaleString("fr-FR")}× plus de chances qu'au Loto + MyMillion`;
   }
-  return `${Math.round(1 / ratioVsLoto).toLocaleString("fr-FR")}× moins de chances qu'au Loto`;
+  return `${Math.round(1 / ratio).toLocaleString("fr-FR")}× moins de chances qu'au Loto + MyMillion`;
 }

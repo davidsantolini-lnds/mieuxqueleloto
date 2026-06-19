@@ -69,6 +69,7 @@ export const CATEGORY_FALLBACK_LABEL: Record<Category, string> = {
   sport: "Réussir dans le sport de haut niveau",
   metier: "Bâtir une carrière dans un métier porteur",
   speculatif: "Tenter une voie spectaculaire (télé, politique…)",
+  absurde: "Réussir ce petit défi de la vie",
 };
 
 // Punchlines poétiques quand rien ne matche du tout.

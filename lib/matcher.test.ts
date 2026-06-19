@@ -229,6 +229,86 @@ describe("fallbacks", () => {
   });
 });
 
+describe("matching — registre absurde / quotidien", () => {
+  // Helper : ces inputs doivent au minimum décrocher une vraie réponse
+  // (jamais le simple fallback poétique).
+  const matched = (q: string) => {
+    const r = match(q, o);
+    expect(r.quality).not.toBe("poetic");
+    expect(r.denominator).toBeGreaterThan(0);
+    return r;
+  };
+
+  it("plier un drap housse → absurde", () =>
+    expect(matched("plier un drap housse").category).toBe("absurde"));
+  it("sortir d'IKEA sans rien acheter → absurde", () =>
+    expect(matched("sortir d'ikea sans rien acheter").category).toBe("absurde"));
+  it("trouver le scotch dans le tiroir → absurde", () =>
+    expect(matched("retrouver le scotch dans le tiroir").category).toBe("absurde"));
+  it("convaincre sa belle-mère → absurde", () =>
+    expect(matched("convaincre ma belle-mère").category).toBe("absurde"));
+  it("dormir 8h avec un nouveau-né → absurde", () =>
+    expect(matched("dormir 8h avec un nouveau-né").category).toBe("absurde"));
+  it("trouver une place de parking à Paris → easter egg", () => {
+    const r = matched("trouver une place de parking à paris");
+    expect(r.label.toLowerCase()).toContain("parking");
+  });
+  it("brancher un câble USB du bon sens → absurde", () =>
+    expect(matched("brancher un câble usb du bon sens").category).toBe("absurde"));
+  it("mettre une pile dans le bon sens → absurde", () =>
+    expect(matched("mettre une pile dans le bon sens").category).toBe("absurde"));
+  it("ouvrir un pot de confiture → absurde", () =>
+    expect(matched("ouvrir un pot de confiture").category).toBe("absurde"));
+  it("déboucher l'évier → absurde", () =>
+    expect(matched("déboucher l'évier").category).toBe("absurde"));
+
+  it("devenir Pape → absurde, quasi impossible", () => {
+    const r = matched("devenir pape");
+    expect(r.category).toBe("absurde");
+    expect(r.denominator).toBeGreaterThan(1_000_000_000 - 1);
+  });
+  it("reine / roi d'Angleterre → absurde", () =>
+    expect(matched("devenir roi d'angleterre").category).toBe("absurde"));
+  it("être frappé par la foudre → absurde", () =>
+    expect(matched("être frappé par la foudre").category).toBe("absurde"));
+  it("voir un OVNI → absurde", () =>
+    expect(matched("voir un ovni").category).toBe("absurde"));
+  it("gagner contre une IA au Go → absurde", () =>
+    expect(matched("gagner contre une ia au go").category).toBe("absurde"));
+
+  it("qu'il pleuve un dimanche → absurde", () =>
+    expect(matched("qu'il pleuve un dimanche").category).toBe("absurde"));
+  it("qu'il neige à Marseille en juillet → absurde", () =>
+    expect(matched("qu'il neige à marseille en juillet").category).toBe("absurde"));
+
+  it("tomber amoureux fou en 6 mois → absurde", () =>
+    expect(matched("tomber amoureux fou en 6 mois").category).toBe("absurde"));
+  it("avoir une augmentation cette année → absurde", () =>
+    expect(matched("avoir une augmentation cette année").category).toBe("absurde"));
+  it("tout quitter pour devenir berger → absurde", () =>
+    expect(matched("tout quitter pour devenir berger").category).toBe("absurde"));
+
+  it("marathon en moins de 3h → absurde", () =>
+    expect(matched("courir un marathon en moins de 3h").category).toBe("absurde"));
+  it("faire 100 pompes d'affilée → absurde", () =>
+    expect(matched("faire 100 pompes d'affilée").category).toBe("absurde"));
+  it("faire le grand écart à 40 ans → absurde", () =>
+    expect(matched("faire le grand écart à 40 ans").category).toBe("absurde"));
+
+  it("« rien » → réponse, jamais un crash", () =>
+    expect(matched("rien").category).toBe("absurde"));
+  it("« ça » → réponse", () =>
+    expect(matched("ça").category).toBe("absurde"));
+  it("« truc machin chose » → absurde", () =>
+    expect(matched("truc machin chose").category).toBe("absurde"));
+  it("« bnjr » (input réel) → absurde", () =>
+    expect(matched("bnjr").category).toBe("absurde"));
+  it("débat pizza ananas → absurde", () =>
+    expect(matched("pizza ananas").category).toBe("absurde"));
+  it("comprendre la TVA → absurde", () =>
+    expect(matched("comprendre la tva").category).toBe("absurde"));
+});
+
 describe("mauvaise foi", () => {
   it("apparaît parfois sur plusieurs tirages", () => {
     let seen = false;

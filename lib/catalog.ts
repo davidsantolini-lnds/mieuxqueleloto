@@ -1,5 +1,6 @@
 import type { CatalogEntry } from "./types";
 import { CATALOG_EXTRA } from "./catalog.extra";
+import { CATALOG_ABSURDE } from "./catalog.absurde";
 
 // =============================================================================
 // CATALOGUE « Mieux que le Loto »
@@ -34,6 +35,15 @@ const CATALOG_CORE: CatalogEntry[] = [
     oddsDenominator: 139_838_160,
     category: "hasard",
     source: "EuroMillions — règlement officiel (rang 1)",
+  },
+  {
+    id: "mymillion",
+    label: "Gagner avec le code MyMillion (EuroMillions)",
+    keywords: ["mymillion", "my million", "code", "millionnaire fdj", "tirage", "euromillions code"],
+    oddsNumerator: 1,
+    oddsDenominator: 5_000_000,
+    category: "hasard",
+    source: "FDJ — un code MyMillion garanti gagnant par tirage EuroMillions",
   },
   {
     id: "scratch-ticket",
@@ -1846,5 +1856,11 @@ const CATALOG_CORE: CatalogEntry[] = [
   },
 ];
 
-// Catalogue complet = base « cœur » + extension de couverture (scale).
-export const CATALOG: CatalogEntry[] = [...CATALOG_CORE, ...CATALOG_EXTRA];
+// Catalogue complet = base « cœur » + extension de couverture (scale) +
+// registre absurde. L'absurde est concaténé en dernier : à score égal, le
+// sérieux gagne (cf. lib/catalog.absurde.ts).
+export const CATALOG: CatalogEntry[] = [
+  ...CATALOG_CORE,
+  ...CATALOG_EXTRA,
+  ...CATALOG_ABSURDE,
+];
