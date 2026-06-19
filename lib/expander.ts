@@ -137,9 +137,78 @@ export const AXES: Record<Axis, Modulator[]> = {
     ["en rachetant un existant", ["racheter", "reprendre", "rachat", "reprise"], 0.7, "racheter"],
     ["en le revendant ensuite", ["revendre", "revente", "ceder", "céder", "sortie"], 0.6, "revendre"],
   ]),
+
+  // --- AXES DU REGISTRE ABSURDE / CRINGE -------------------------------------
+  // Appliqués uniquement aux entrées de catégorie "absurde" (cf. matcher).
+  // Ils modulent la difficulté d'un petit défi du quotidien selon le contexte.
+  intensite: buildModulators([
+    ["du premier coup", ["du premier coup", "premier coup", "direct", "directos"], 2.5, "premiercoup"],
+    ["à coup sûr", ["a coup sur", "coup sur", "garanti", "sans rater"], 3, "coupsur"],
+    ["sans bug", ["sans bug", "sans accroc", "sans souci", "nickel"], 1.8, "sansbug"],
+    ["sans drama", ["sans drama", "sans embrouille", "sans clash", "sans prise de tete"], 2, "sansdrama"],
+    ["du tac au tac", ["du tac au tac", "tac au tac", "instantanement", "sur le champ"], 2.2, "tacautac"],
+    ["les yeux fermés", ["les yeux fermes", "yeux fermes", "easy", "trop facile"], 0.5, "yeuxfermes"],
+  ]),
+
+  social: buildModulators([
+    ["en réunion", ["en reunion", "reunion", "meeting", "en plein meeting"], 2, "reunion"],
+    ["devant ma belle-mère", ["devant ma belle mere", "belle mere", "beaux parents"], 4, "bellemere"],
+    ["au premier rendez-vous", ["premier rendez vous", "premier date", "premier rencard", "first date"], 3, "premierdate"],
+    ["pendant un entretien", ["pendant un entretien", "entretien embauche", "entretien d embauche", "entretien boulot"], 3.5, "entretien"],
+    ["devant mes parents", ["devant mes parents", "devant les parents", "devant ma famille"], 2.5, "parents"],
+    ["en public", ["en public", "devant tout le monde", "en pleine rue", "devant les gens"], 2.2, "public"],
+    ["en visio", ["en visio", "visioconference", "appel video", "en zoom"], 1.8, "visio"],
+  ]),
+
+  lieuabsurde: buildModulators([
+    ["dans un Uber", ["dans un uber", "en uber", "course uber"], 1.5, "uber"],
+    ["dans le RER", ["dans le rer", "le rer", "rer bonde", "rer a"], 1.6, "rer"],
+    ["en open space", ["en open space", "open space", "bureau partage"], 1.8, "openspace"],
+    ["au McDo", ["au mcdo", "mcdo", "drive", "fast food"], 1.3, "mcdo"],
+    ["à la préfecture", ["a la prefecture", "prefecture", "guichet"], 3, "prefecture"],
+    ["dans l'ascenseur", ["dans l ascenseur", "ascenseur", "cabine ascenseur"], 1.5, "ascenseur"],
+    ["en réunion Teams", ["reunion teams", "appel teams", "sur teams"], 1.7, "teams"],
+    ["en vacances", ["en vacances", "pendant les vacances", "en conges"], 1.5, "vacances"],
+  ]),
+
+  personne: buildModulators([
+    ["avec un boss qui te déteste", ["avec mon boss", "mon boss", "mon patron", "chef relou"], 2.5, "boss"],
+    ["avec un parent toxique", ["parent toxique", "famille toxique", "mere toxique", "pere toxique"], 4, "toxique"],
+    ["avec un Parisien pressé", ["parisien presse", "un parisien", "gens presses"], 2, "parisien"],
+    ["avec un commercial collant", ["commercial collant", "vendeur insistant", "demarcheur telephone"], 2.5, "commercial"],
+    ["avec un voisin relou", ["voisin relou", "voisin bruyant", "le voisinage"], 2.2, "voisin"],
+    ["avec un ado en crise", ["avec un ado", "adolescent", "mon ado", "crise d ado"], 3, "ado"],
+  ]),
+
+  frequence: buildModulators([
+    ["tous les jours", ["tous les jours", "chaque jour", "quotidiennement", "au quotidien"], 30, "tousjours"],
+    ["une fois par semaine", ["une fois par semaine", "par semaine", "chaque semaine", "hebdo"], 6, "semaine"],
+    ["à chaque fois", ["a chaque fois", "chaque fois", "systematiquement", "a tous les coups"], 12, "chaquefois"],
+    ["ne serait-ce qu'une fois", ["ne serait ce qu une fois", "une seule fois", "au moins une fois", "juste une fois"], 0.4, "unefois"],
+  ]),
 };
 
-export const AXIS_ORDER: Axis[] = ["lieu", "specialisation", "echelle", "format", "stage"];
+export const AXIS_ORDER: Axis[] = [
+  "lieu",
+  "specialisation",
+  "echelle",
+  "format",
+  "stage",
+  "intensite",
+  "social",
+  "lieuabsurde",
+  "personne",
+  "frequence",
+];
+
+/** Axes réservés au registre absurde — applicables à toute entrée "absurde". */
+export const ABSURDE_AXES: Axis[] = [
+  "intensite",
+  "social",
+  "lieuabsurde",
+  "personne",
+  "frequence",
+];
 
 /** Borne le dénominateur pour rester crédible. */
 export function clampDenominator(n: number): number {

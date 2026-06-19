@@ -17,7 +17,18 @@ export type Category =
  * un SaaS a un format mais pas de ville). L'expander combine ces axes pour
  * générer, à la volée, l'espace des variantes — sans jamais le matérialiser.
  */
-export type Axis = "lieu" | "specialisation" | "echelle" | "format" | "stage";
+export type Axis =
+  | "lieu"
+  | "specialisation"
+  | "echelle"
+  | "format"
+  | "stage"
+  // Axes spécifiques au registre absurde / cringe (cf. lib/expander.ts).
+  | "intensite"
+  | "social"
+  | "lieuabsurde"
+  | "personne"
+  | "frequence";
 
 export type CatalogEntry = {
   id: string;

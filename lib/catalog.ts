@@ -1,6 +1,12 @@
-import type { CatalogEntry } from "./types";
+import type { Axis, CatalogEntry } from "./types";
 import { CATALOG_EXTRA } from "./catalog.extra";
 import { CATALOG_ABSURDE } from "./catalog.absurde";
+import { CATALOG_CRINGE_1 } from "./catalog.cringe1";
+import { CATALOG_CRINGE_2 } from "./catalog.cringe2";
+import { CATALOG_CRINGE_3 } from "./catalog.cringe3";
+import { CATALOG_CRINGE_4 } from "./catalog.cringe4";
+import { CATALOG_CRINGE_5 } from "./catalog.cringe5";
+import { CATALOG_CRINGE_6 } from "./catalog.cringe6";
 
 // =============================================================================
 // CATALOGUE « Mieux que le Loto »
@@ -1856,11 +1862,40 @@ const CATALOG_CORE: CatalogEntry[] = [
   },
 ];
 
-// Catalogue complet = base « cœur » + extension de couverture (scale) +
-// registre absurde. L'absurde est concaténé en dernier : à score égal, le
-// sérieux gagne (cf. lib/catalog.absurde.ts).
+// Registre absurde complet = ancien catalogue absurde + 6 lots « cringe ».
+const ABSURDE_RAW: CatalogEntry[] = [
+  ...CATALOG_ABSURDE,
+  ...CATALOG_CRINGE_1,
+  ...CATALOG_CRINGE_2,
+  ...CATALOG_CRINGE_3,
+  ...CATALOG_CRINGE_4,
+  ...CATALOG_CRINGE_5,
+  ...CATALOG_CRINGE_6,
+];
+
+// On attribue 2 axes absurdes par entrée (paires rotatives). Les 5 axes
+// absurdes restent TOUS applicables au match (cf. matcher) ; ces 2 axes ne
+// servent qu'à calibrer l'espace combinatoire (effectiveCount) ≈ 600k. À score
+// égal le sérieux gagne, donc l'absurde est concaténé en dernier.
+const ABSURDE_AXIS_PAIRS: Axis[][] = [
+  ["intensite", "social"],
+  ["lieuabsurde", "frequence"],
+  ["social", "personne"],
+  ["intensite", "lieuabsurde"],
+  ["personne", "frequence"],
+  ["social", "frequence"],
+  ["intensite", "personne"],
+  ["lieuabsurde", "personne"],
+];
+
+const ABSURDE_WITH_AXES: CatalogEntry[] = ABSURDE_RAW.map((entry, i) => ({
+  ...entry,
+  axes: entry.axes ?? ABSURDE_AXIS_PAIRS[i % ABSURDE_AXIS_PAIRS.length],
+}));
+
+// Catalogue complet = base « cœur » + extension de couverture + registre absurde.
 export const CATALOG: CatalogEntry[] = [
   ...CATALOG_CORE,
   ...CATALOG_EXTRA,
-  ...CATALOG_ABSURDE,
+  ...ABSURDE_WITH_AXES,
 ];

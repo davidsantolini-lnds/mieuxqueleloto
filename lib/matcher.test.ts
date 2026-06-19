@@ -28,12 +28,21 @@ describe("normalize / tokenize", () => {
 });
 
 describe("catalogue, scale & compteur", () => {
-  it("la base hand-curatée est substantielle", () => {
-    expect(BASE_COUNT).toBeGreaterThan(250);
+  it("la base hand-curatée est massive (registre absurde inclus)", () => {
+    expect(BASE_COUNT).toBeGreaterThan(2000);
     expect(CATALOG.length).toBe(BASE_COUNT);
   });
-  it("l'espace effectif dépasse 100 000 combinaisons", () => {
-    expect(effectiveCount()).toBeGreaterThanOrEqual(100_000);
+  it("le registre absurde domine la base", () => {
+    const absurde = CATALOG.filter((e) => e.category === "absurde").length;
+    expect(absurde).toBeGreaterThan(1500);
+  });
+  it("l'espace effectif vise ~600 000 combinaisons", () => {
+    expect(effectiveCount()).toBeGreaterThanOrEqual(500_000);
+  });
+  it("les 5 axes absurdes existent et sont fournis", () => {
+    for (const a of ["intensite", "social", "lieuabsurde", "personne", "frequence"] as const) {
+      expect(axisCardinality(a)).toBeGreaterThanOrEqual(4);
+    }
   });
   it("l'axe lieu propose ~50 modulateurs", () => {
     expect(axisCardinality("lieu")).toBeGreaterThanOrEqual(45);
@@ -337,6 +346,64 @@ describe("matching — registre absurde / quotidien", () => {
   it("le sérieux garde la priorité : jouer au loto reste du hasard", () => {
     expect(match("jouer au loto", o).category).toBe("hasard");
     expect(match("jouer en nba", o).category).toBe("sport");
+  });
+});
+
+describe("matching — registre cringe (scale à fond)", () => {
+  const matched = (q: string) => {
+    const r = match(q, o);
+    expect(r.quality).not.toBe("poetic");
+    expect(r.denominator).toBeGreaterThan(0);
+    return r;
+  };
+
+  it("péter en open space → absurde", () =>
+    expect(matched("péter en open space").category).toBe("absurde"));
+  it("éternuer en réunion → absurde", () =>
+    expect(matched("éternuer en réunion").category).toBe("absurde"));
+  it("sms au mauvais destinataire → absurde", () =>
+    expect(matched("envoyer un sms au mauvais destinataire").category).toBe("absurde"));
+  it("liker la photo de son ex à 3h du mat → absurde", () =>
+    expect(matched("liker la photo insta de mon ex à 3h du mat").category).toBe("absurde"));
+  it("comprendre sa fiche de paie → absurde", () =>
+    expect(matched("comprendre ma fiche de paie").category).toBe("absurde"));
+  it("rdv à la préfecture → absurde", () =>
+    expect(matched("obtenir un rdv à la préfecture").category).toBe("absurde"));
+  it("rater le RER A → absurde", () =>
+    expect(matched("rater le rer a").category).toBe("absurde"));
+  it("raclette pour 12 → absurde", () =>
+    expect(matched("réussir une raclette pour 12").category).toBe("absurde"));
+  it("Noël sans engueulade → absurde", () =>
+    expect(matched("noël sans engueulade politique").category).toBe("absurde"));
+  it("mot de passe wifi de la box → absurde", () =>
+    expect(matched("retrouver le mot de passe wifi de la box").category).toBe("absurde"));
+  it("que mon chat me respecte → absurde", () =>
+    expect(matched("que mon chat me respecte").category).toBe("absurde"));
+  it("finir une soirée sans regret → absurde", () =>
+    expect(matched("finir une soirée sans regret").category).toBe("absurde"));
+  it("payer ses impôts dans les délais → absurde", () =>
+    expect(matched("payer ses impôts dans les délais").category).toBe("absurde"));
+});
+
+describe("axes du registre absurde (modulateurs contextuels)", () => {
+  it("« en réunion » ajoute le contexte au label", () => {
+    const r = match("éternuer en réunion", o);
+    expect(r.label.toLowerCase()).toContain("réunion");
+  });
+  it("« à la préfecture » est détecté et durcit la proba", () => {
+    const base = match("obtenir un rdv", o);
+    const ctx = match("obtenir un rdv à la préfecture", o);
+    expect(ctx.label.toLowerCase()).toContain("préfecture");
+    expect(ctx.denominator).toBeGreaterThanOrEqual(base.denominator);
+  });
+  it("« tous les jours » empile un second modulateur", () => {
+    const r = match("rester calme avec un ado en crise tous les jours", o);
+    expect(r.label.toLowerCase()).toContain("tous les jours");
+  });
+  it("les axes contextuels ne s'appliquent PAS au sérieux", () => {
+    // « en réunion » ne doit pas moduler une activité sérieuse comme la boulangerie.
+    const r = match("ouvrir une boulangerie en réunion", o);
+    expect(r.label.toLowerCase()).not.toContain("réunion");
   });
 });
 

@@ -1,7 +1,7 @@
 import type { Axis, Category, CatalogEntry, MatchResult } from "./types";
 import { BASELINE_DENOMINATOR } from "./types";
 import { CATALOG } from "./catalog";
-import { AXES, AXIS_ORDER, applyModulators, type Modulator } from "./expander";
+import { ABSURDE_AXES, AXES, AXIS_ORDER, applyModulators, type Modulator } from "./expander";
 import {
   classifyCategory,
   CATEGORY_FALLBACK_LABEL,
@@ -242,13 +242,19 @@ function extractModifiers(
   inputNorm: string,
   consumed: Set<string>,
 ): { axis: Axis; mod: Modulator }[] {
-  const axes = entry.axes;
-  if (!axes || axes.length === 0) return [];
+  const axes = entry.axes ?? [];
+  // Pour le registre absurde, TOUS les axes contextuels (intensité, social,
+  // lieu absurde, personne, fréquence) sont applicables, quels que soient les
+  // axes déclarés par l'entrée (qui ne servent qu'au calcul combinatoire).
+  const isAbsurde = entry.category === "absurde";
+  if (axes.length === 0 && !isAbsurde) return [];
   const modIndex = buildModIndex();
   const applied: { axis: Axis; mod: Modulator }[] = [];
 
   for (const axis of AXIS_ORDER) {
-    if (!axes.includes(axis)) continue;
+    const coherent =
+      axes.includes(axis) || (isAbsurde && ABSURDE_AXES.includes(axis));
+    if (!coherent) continue;
     let best: Modulator | null = null;
     let bestLen = 0;
     for (const { mod, tokens, phrases } of modIndex[axis]) {
