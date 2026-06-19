@@ -13,8 +13,14 @@ function buildShareText(result: MatchResult, query: string): string {
   )}. Soit ${formatRatio(result.ratioVsLoto)} 🎰 Teste ton idée :`;
 }
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://mieuxqueleloto.fr";
+// Base des liens de partage : la variable d'env si définie, sinon l'origine
+// réelle du site au runtime (fonctionne tel quel sur n'importe quel domaine,
+// y compris l'URL *.vercel.app — aucun réglage requis pour partager).
+function shareBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  if (typeof window !== "undefined") return window.location.origin;
+  return "";
+}
 
 export default function ShareButtons({
   result,
@@ -25,9 +31,8 @@ export default function ShareButtons({
 }) {
   const [copied, setCopied] = useState(false);
   const text = buildShareText(result, query);
-  const url = query
-    ? `${SITE_URL}/?q=${encodeURIComponent(query)}`
-    : SITE_URL;
+  const base = shareBaseUrl();
+  const url = query ? `${base}/?q=${encodeURIComponent(query)}` : base;
 
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     text,
