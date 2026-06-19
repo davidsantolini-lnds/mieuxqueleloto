@@ -31,7 +31,7 @@ export default function BottomAdBar() {
   }
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 z-40 mt-8">
+    <div className="sticky bottom-0 left-0 right-0 z-40 mt-2 sm:mt-8">
       <div className="glass flex h-[60px] w-full items-center justify-center overflow-hidden border-x-0 border-b-0 px-3 md:h-[80px]">
         {content}
       </div>

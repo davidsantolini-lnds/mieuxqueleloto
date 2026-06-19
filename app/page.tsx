@@ -8,7 +8,7 @@ const EFFECTIVE_PRETTY = effectiveCount().toLocaleString("fr-FR");
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center px-4 pb-20 pt-6 sm:pt-12 md:pt-16">
+    <main className="flex flex-1 flex-col items-center px-4 pb-4 pt-6 sm:pb-20 sm:pt-12 md:pt-16">
       {/* Hero */}
       <section className="animate-fade-up w-full max-w-2xl text-center">
         <span className="inline-block rounded-full border border-ink/10 bg-white/50 px-3 py-1 text-[11px] font-semibold tracking-wide text-muted sm:px-4 sm:py-1.5 sm:text-xs">
