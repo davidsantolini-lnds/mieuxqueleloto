@@ -1,24 +1,30 @@
-import type { Category, ExpandedEntry, MatchResult } from "./types";
+import type { Axis, Category, CatalogEntry, MatchResult } from "./types";
 import { LOTO_DENOMINATOR } from "./types";
-import { getExpandedCatalog } from "./expander";
+import { CATALOG } from "./catalog";
+import { AXES, AXIS_ORDER, applyModulators, type Modulator } from "./expander";
 import {
   classifyCategory,
   CATEGORY_FALLBACK_LABEL,
   randomPoetic,
 } from "./fallback";
 import { generateBadFaith, shouldBeBadFaith } from "./badFaith";
+import { formatOdds, formatRatio } from "./format";
+
+export { formatOdds, formatRatio } from "./format";
 
 // =============================================================================
 // MATCHER (100% client-side, zéro appel réseau)
 // -----------------------------------------------------------------------------
-// 1. Normalise l'input (minuscule, sans accents, sans mots vides FR).
-// 2. Score chaque entrée par chevauchement de mots-clés (overlap pondéré).
-// 3. Seuils : >0.3 fort · 0.15-0.3 faible (+disclaimer) · sinon classifier de
-//    catégorie · sinon fallback poétique.
-// 4. 1 réponse sur 4 → mauvaise foi.
+// Stratégie « base + modulateurs » pour scaler à 100k+ sans dégrader le match :
+//   1. Normalise l'input (minuscule, sans accents, sans mots vides FR).
+//   2. Matche la BASE (~300 entrées) via un INVERTED INDEX mot-clé → entrées,
+//      donc coût ~O(mots de la requête), pas O(taille de l'espace).
+//   3. Détecte les modulateurs (lieu / spécialisation / échelle / format /
+//      stade) présents dans la requête, cohérents avec l'entrée, et les
+//      applique → variante générée à la volée.
+//   4. Seuils + fallbacks (classifier de catégorie, poétique) + mauvaise foi.
 // =============================================================================
 
-// Mots vides FR à retirer.
 const STOP_WORDS = new Set([
   "le", "la", "les", "un", "une", "des", "de", "du", "d", "au", "aux", "à", "a",
   "et", "ou", "où", "en", "dans", "pour", "par", "sur", "avec", "sans", "son",
@@ -29,16 +35,37 @@ const STOP_WORDS = new Set([
   "the", "to", "of", "in", "my",
 ]);
 
-// Mots génériques d'action : signal faible (poids réduit).
 const GENERIC_WEIGHT_WORDS = new Set([
   "ouvrir", "lancer", "creer", "monter", "devenir", "faire", "gagner", "vivre",
   "etre", "avoir", "tenter", "essayer", "idee", "projet", "activite", "travail",
   "job", "metier", "argent", "riche", "millionnaire", "million", "fortune",
-  "reussir", "percer", "gens", "vendre",
+  "reussir", "percer", "gens", "vendre", "carriere", "profession",
 ]);
 
 const GENERIC_WEIGHT = 0.3;
 const STRONG_WEIGHT = 1;
+// Poids des mots qui sont des modulateurs d'axe (lieu, « niche », « haut de
+// gamme », « franchise »…). On les sous-pondère pour le match de BASE : ils
+// servent surtout à moduler, pas à choisir l'activité. Ainsi « boulangerie haut
+// de gamme à Lyon » matche bien « boulangerie » (et pas « marque de luxe »).
+const AXIS_WEIGHT = 0.4;
+
+let _axisTokens: Set<string> | null = null;
+function axisTokens(): Set<string> {
+  if (_axisTokens) return _axisTokens;
+  const s = new Set<string>();
+  for (const axis of AXIS_ORDER) {
+    for (const mod of AXES[axis]) {
+      for (const kw of mod.keywords) {
+        for (const part of normalize(kw).split(/[\s-]+/)) {
+          if (part.length >= 2 && !STOP_WORDS.has(part)) s.add(part);
+        }
+      }
+    }
+  }
+  _axisTokens = s;
+  return s;
+}
 
 export function normalize(text: string): string {
   return text
@@ -63,28 +90,39 @@ export function tokenize(text: string): WeightedToken[] {
     if (STOP_WORDS.has(raw)) continue;
     if (seen.has(raw)) continue;
     seen.add(raw);
-    tokens.push({
-      word: raw,
-      weight: GENERIC_WEIGHT_WORDS.has(raw) ? GENERIC_WEIGHT : STRONG_WEIGHT,
-    });
+    const weight = GENERIC_WEIGHT_WORDS.has(raw)
+      ? GENERIC_WEIGHT
+      : axisTokens().has(raw)
+        ? AXIS_WEIGHT
+        : STRONG_WEIGHT;
+    tokens.push({ word: raw, weight });
   }
   return tokens;
 }
 
-// --- Index des entrées : tokens de mots-clés précalculés ---------------------
+// --- Index inversé sur la BASE -----------------------------------------------
 
-type IndexedEntry = {
-  entry: ExpandedEntry;
+type IndexedBase = {
+  entry: CatalogEntry;
   tokenSet: Set<string>;
   tokens: string[];
-  phrases: string[]; // mots-clés multi-mots normalisés (pour bonus de phrase)
+  phrases: string[]; // mots-clés multi-mots normalisés
 };
 
-let _index: IndexedEntry[] | null = null;
+type Index = {
+  bases: IndexedBase[];
+  postings: Map<string, number[]>; // token → indices d'entrées de base
+  allTokens: string[];
+};
 
-function buildIndex(): IndexedEntry[] {
+let _index: Index | null = null;
+
+function buildIndex(): Index {
   if (_index) return _index;
-  _index = getExpandedCatalog().map((entry) => {
+  const bases: IndexedBase[] = [];
+  const postings = new Map<string, number[]>();
+
+  CATALOG.forEach((entry, i) => {
     const tokenSet = new Set<string>();
     const phrases: string[] = [];
     for (const kw of entry.keywords) {
@@ -94,41 +132,47 @@ function buildIndex(): IndexedEntry[] {
         if (part.length >= 2 && !STOP_WORDS.has(part)) tokenSet.add(part);
       }
     }
-    return { entry, tokenSet, tokens: [...tokenSet], phrases };
+    for (const t of tokenSet) {
+      let list = postings.get(t);
+      if (!list) postings.set(t, (list = []));
+      list.push(i);
+    }
+    bases.push({ entry, tokenSet, tokens: [...tokenSet], phrases });
   });
+
+  _index = { bases, postings, allTokens: [...postings.keys()] };
   return _index;
 }
 
-function tokenMatches(word: string, idx: IndexedEntry): boolean {
-  if (idx.tokenSet.has(word)) return true;
-  // Match par préfixe pour les pluriels/genres/déclinaisons uniquement
-  // (« boulanger » ~ « boulangerie »). On exige un préfixe d'au moins 4
-  // caractères ET un écart de longueur faible, sinon « foot » avalerait
-  // « footballeur » ou « prof » avalerait « professionnel ».
+function prefixMatch(a: string, b: string): boolean {
+  if (a.length < 4 || b.length < 4) return false;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  return long.startsWith(short) && long.length - short.length <= 3;
+}
+
+function tokenMatches(word: string, base: IndexedBase): boolean {
+  if (base.tokenSet.has(word)) return true;
   if (word.length >= 4) {
-    for (const t of idx.tokens) {
-      if (t.length < 4) continue;
-      const [short, long] = word.length <= t.length ? [word, t] : [t, word];
-      if (long.startsWith(short) && long.length - short.length <= 3) return true;
+    for (const t of base.tokens) {
+      if (prefixMatch(word, t)) return true;
     }
   }
   return false;
 }
 
-function scoreEntry(
+function scoreBase(
   tokens: WeightedToken[],
   inputNorm: string,
-  idx: IndexedEntry,
+  base: IndexedBase,
 ): number {
   let matched = 0;
   let total = 0;
   for (const t of tokens) {
     total += t.weight;
-    if (tokenMatches(t.word, idx)) matched += t.weight;
+    if (tokenMatches(t.word, base)) matched += t.weight;
   }
   let score = total > 0 ? matched / total : 0;
-  // Bonus si un mot-clé multi-mots apparaît tel quel dans l'input.
-  for (const phrase of idx.phrases) {
+  for (const phrase of base.phrases) {
     if (phrase.length >= 5 && inputNorm.includes(phrase)) {
       score = Math.min(1, score + 0.25);
       break;
@@ -137,15 +181,102 @@ function scoreEntry(
   return score;
 }
 
-// --- Formatage (réexporté depuis le module léger) ----------------------------
+/** Ensemble des indices d'entrées candidates pour ces tokens (postings + préfixe). */
+function gatherCandidates(tokens: WeightedToken[], idx: Index): Set<number> {
+  const cand = new Set<number>();
+  for (const t of tokens) {
+    const exact = idx.postings.get(t.word);
+    if (exact) {
+      for (const i of exact) cand.add(i);
+    } else if (t.word.length >= 4) {
+      for (const it of idx.allTokens) {
+        if (prefixMatch(t.word, it)) {
+          for (const i of idx.postings.get(it)!) cand.add(i);
+        }
+      }
+    }
+  }
+  return cand;
+}
 
-export { formatOdds, formatRatio } from "./format";
-import { formatOdds, formatRatio } from "./format";
+// --- Index des modulateurs (axes) --------------------------------------------
+
+type IndexedMod = {
+  mod: Modulator;
+  tokens: Set<string>;
+  phrases: string[];
+};
+
+let _modIndex: Record<Axis, IndexedMod[]> | null = null;
+
+function buildModIndex(): Record<Axis, IndexedMod[]> {
+  if (_modIndex) return _modIndex;
+  const out = {} as Record<Axis, IndexedMod[]>;
+  for (const axis of AXIS_ORDER) {
+    out[axis] = AXES[axis].map((mod) => {
+      const tokens = new Set<string>();
+      const phrases: string[] = [];
+      for (const kw of mod.keywords) {
+        const n = normalize(kw);
+        if (n.includes(" ")) phrases.push(n);
+        else if (n.length >= 2) tokens.add(n);
+      }
+      return { mod, tokens, phrases };
+    });
+  }
+  _modIndex = out;
+  return out;
+}
+
+/**
+ * Détecte, pour chaque axe cohérent avec l'entrée, le modulateur le plus
+ * spécifique présent dans la requête. Ignore les tokens déjà « consommés »
+ * par le match de base (pour éviter qu'« ouvrir une franchise » applique
+ * deux fois « franchise »).
+ */
+function extractModifiers(
+  entry: CatalogEntry,
+  queryWords: Set<string>,
+  inputNorm: string,
+  consumed: Set<string>,
+): { axis: Axis; mod: Modulator }[] {
+  const axes = entry.axes;
+  if (!axes || axes.length === 0) return [];
+  const modIndex = buildModIndex();
+  const applied: { axis: Axis; mod: Modulator }[] = [];
+
+  for (const axis of AXIS_ORDER) {
+    if (!axes.includes(axis)) continue;
+    let best: Modulator | null = null;
+    let bestLen = 0;
+    for (const { mod, tokens, phrases } of modIndex[axis]) {
+      let matchedLen = 0;
+      for (const phrase of phrases) {
+        if (phrase.length >= 4 && inputNorm.includes(phrase)) {
+          matchedLen = Math.max(matchedLen, phrase.length);
+        }
+      }
+      for (const tk of tokens) {
+        if (queryWords.has(tk) && !consumed.has(tk)) {
+          matchedLen = Math.max(matchedLen, tk.length);
+        }
+      }
+      if (matchedLen > bestLen) {
+        best = mod;
+        bestLen = matchedLen;
+      }
+    }
+    if (best) applied.push({ axis, mod: best });
+  }
+  return applied;
+}
+
+// --- Catégorie de repli ------------------------------------------------------
 
 function geometricMeanDenominator(category: Category): number {
-  const denoms = getExpandedCatalog()
-    .filter((e) => e.category === category && !e.id.includes("--"))
-    .map((e) => e.oddsDenominator);
+  const denoms = CATALOG.filter((e) => e.category === category).map(
+    (e) => e.oddsDenominator,
+  );
   if (denoms.length === 0) return 10_000;
   const logSum = denoms.reduce((acc, d) => acc + Math.log(d), 0);
   return Math.exp(logSum / denoms.length);
@@ -165,37 +296,50 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
   const tokens = tokenize(input);
   const inputNorm = normalize(input);
 
-  // Input vide → fallback poétique direct.
-  if (tokens.length === 0) {
-    return poeticResult();
-  }
+  if (tokens.length === 0) return poeticResult();
 
-  // Meilleur score sur tout le catalogue étendu.
-  const index = buildIndex();
-  let best: IndexedEntry | null = null;
+  const idx = buildIndex();
+  const candidates = gatherCandidates(tokens, idx);
+
+  let best: IndexedBase | null = null;
   let bestScore = 0;
-  for (const idx of index) {
-    const s = scoreEntry(tokens, inputNorm, idx);
+  for (const i of candidates) {
+    const base = idx.bases[i];
+    const s = scoreBase(tokens, inputNorm, base);
     if (s > bestScore) {
       bestScore = s;
-      best = idx;
+      best = base;
     }
   }
 
   if (best && bestScore >= WEAK_THRESHOLD) {
-    const e = best.entry;
-    const denominator = e.oddsDenominator;
+    const entry = best.entry;
+
+    // Tokens consommés par le match de base (exclus de la détection modulateurs).
+    const consumed = new Set<string>();
+    for (const t of tokens) {
+      if (tokenMatches(t.word, best)) consumed.add(t.word);
+    }
+    const queryWords = new Set(tokens.map((t) => t.word));
+    const mods = extractModifiers(entry, queryWords, inputNorm, consumed);
+
+    const { denominator, labels } = applyModulators(entry, mods);
+    const label = labels.length
+      ? `${entry.label} (${labels.join(", ")})`
+      : entry.label;
     const ratioVsLoto = LOTO_DENOMINATOR / denominator;
     const quality = bestScore >= STRONG_THRESHOLD ? "strong" : "weak";
+
     return finalize({
       denominator,
       ratioVsLoto,
-      label: e.label,
-      category: e.category,
+      label,
+      category: entry.category,
       quality,
-      source: e.source,
-      estimate: e.estimate,
+      source: entry.source,
+      estimate: entry.estimate,
       score: bestScore,
+      modifiers: labels,
       disclaimer:
         quality === "weak"
           ? "Match approximatif — on a fait au mieux avec ce que tu as tapé."
@@ -223,7 +367,6 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
     });
   }
 
-  // Rien → poétique.
   return poeticResult();
 }
 
@@ -250,11 +393,11 @@ function finalize(args: {
   estimate?: boolean;
   score: number;
   disclaimer?: string;
+  modifiers?: string[];
   opts: MatchOptions;
 }): MatchResult {
   const { denominator, ratioVsLoto } = args;
 
-  // Mauvaise foi 1 fois sur 4.
   if (!args.opts.disableBadFaith && shouldBeBadFaith()) {
     const bf = generateBadFaith({ label: args.label, denominator, ratioVsLoto });
     return {
@@ -269,6 +412,7 @@ function finalize(args: {
       message: bf.text,
       badFaith: true,
       disclaimer: args.disclaimer,
+      modifiers: args.modifiers,
     };
   }
 
@@ -285,5 +429,6 @@ function finalize(args: {
     message,
     badFaith: false,
     disclaimer: args.disclaimer,
+    modifiers: args.modifiers,
   };
 }

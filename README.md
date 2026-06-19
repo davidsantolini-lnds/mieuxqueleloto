@@ -8,8 +8,8 @@ instantanément avec **ta probabilité de devenir millionnaire**, comparée au
 > « Devenir millionnaire en ouvrant une boulangerie : **1 chance sur 40**.
 > Soit **476 721× plus de chances** qu'au Loto. »
 
-- 🤓 ~150 activités de base hand-curatées, étendues à ~900 combinaisons via un
-  moteur de variation (lieu, spécialisation, échelle, canal).
+- 🤓 ~350 activités de base hand-curatées, étendues à **490 000+ combinaisons**
+  générées à la volée (axes : lieu, spécialisation, échelle, format, stade).
 - 🤥 1 réponse sur 4 = **mauvaise foi** (6 styles d'humour qui tournent).
 - 🪄 Fallback poétique quand rien ne matche.
 - ⚡️ Matching **100 % côté client** — zéro appel API, page entièrement statique.

@@ -48,41 +48,55 @@ Exemple :
   category: "entrepreneuriat",
   source: "INSEE / CGAD — boulangerie-pâtisserie, survie & marge",
   estimate: true,
-  spinFactors: ["lieu", "specialisation"],
+  axes: ["lieu", "specialisation"],
 },
 ```
 
-## L'expander (variantes)
+La base vit dans deux fichiers : `lib/catalog.ts` (cœur) et `lib/catalog.extra.ts`
+(extension de couverture). Les deux sont concaténés dans l'export `CATALOG`.
 
-Si une entrée a des `spinFactors`, `lib/expander.ts` génère :
+## Scale : base + axes (pas de matérialisation)
 
-- la variante **de base** (sans modificateur),
-- une variante **par modulateur unique** (« à la campagne », « en niche »…),
-- toutes les **combinaisons** des facteurs (« en niche à Paris »…).
+On **ne stocke pas** les 100k+ variantes (20 Mo de bundle = mort du site). À la
+place : une base hand-curatée (~350 entrées) + des **AXES** de modulation dans
+`lib/expander.ts`. L'espace combinatoire est *calculable* (`effectiveCount()`,
+≈ 490 000) mais **généré à la volée** par le matcher.
 
-Chaque modulateur applique un **multiplicateur** au dénominateur :
+Chaque modulateur applique un **multiplicateur** au dénominateur (`< 1` = plus
+facile, `> 1` = plus dur) :
 
-| Facteur          | Modulateurs (extrait)                          | Effet                       |
-| ---------------- | ---------------------------------------------- | --------------------------- |
-| `lieu`           | Paris, Lyon, banlieue, campagne, étranger…     | densité de marché           |
-| `specialisation` | niche, généraliste, haut de gamme              | niche = plus facile         |
-| `echelle`        | solo, équipe, multi-sites/franchise            | scaler = plus facile        |
-| `canal`          | en ligne, boutique physique                    | online = plus facile        |
+| Axe              | Modulateurs (extrait)                          | Cardinalité |
+| ---------------- | ---------------------------------------------- | ----------- |
+| `lieu`           | Paris, Lyon, banlieue, campagne, étranger…     | ~50         |
+| `specialisation` | niche, généraliste, haut de gamme, bio, luxe…  | ~17         |
+| `echelle`        | solo, équipe, franchise, multi-sites, intl…    | 7           |
+| `format`         | en ligne, app, marketplace, abonnement…        | 6           |
+| `stage`          | lancer, faire grossir, racheter, revendre      | 4           |
 
-Exemple : « ouvrir une boulangerie **à la campagne** » → la variante `campagne`
-(facteur 1,6) donne `40 × 1,6 = 1 chance sur 64` (plus dur qu'en ville).
+Une entrée déclare les axes **cohérents** avec elle (`axes: [...]`) — une
+boulangerie a un `lieu` mais pas de `format` « online » ; un SaaS a un `format`
+mais pas de ville. C'est le filtre de cohérence.
 
-Les valeurs des modulateurs vivent dans la constante `MODULATORS` de
-`lib/expander.ts` — ajuste-les là si besoin.
+`effectiveCount()` = somme, sur chaque entrée, du produit des `(cardinalité + 1)`
+de ses axes. Exemple : « ouvrir une boulangerie **à la campagne** » → modulateur
+lieu `campagne` (×1,6) → `40 × 1,6 = 1 chance sur 64`.
+
+Les valeurs des modulateurs vivent dans la constante `AXES` de `lib/expander.ts`.
 
 ## Le matcher (résumé)
 
-`lib/matcher.ts` :
+`lib/matcher.ts` — stratégie « base + modulateurs », coût ~O(mots de la requête)
+grâce à un **index inversé** (mot-clé → entrées de base), donc indépendant de la
+taille de l'espace (100k+) :
 
 1. **Normalise** l'input (minuscules, sans accents, sans mots vides FR).
-2. **Score** chaque entrée étendue par chevauchement de mots-clés pondéré
-   (les mots génériques comme « ouvrir », « devenir » pèsent moins).
-3. **Seuils** :
+2. **Matche la BASE** (~350 entrées) par chevauchement de mots-clés pondéré
+   (mots génériques « ouvrir/devenir » et mots d'axe « niche/à Paris » sous-pondérés,
+   pour que le nom de l'activité l'emporte).
+3. **Détecte les modulateurs** présents dans la requête (cohérents avec l'entrée)
+   et les applique → variante générée à la volée. « ouvrir un food truck à Paris »
+   = entrée *food truck* + modulateur lieu *Paris*, jamais une entrée géo random.
+4. **Seuils** :
    - score **> 0,3** → réponse directe ;
    - **0,15–0,3** → match faible (+ disclaimer) ;
    - **< 0,15** → on tente le **classifier de catégorie** (familles de mots) ;

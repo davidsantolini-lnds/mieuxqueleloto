@@ -1,17 +1,19 @@
 import type { CatalogEntry } from "./types";
+import { CATALOG_EXTRA } from "./catalog.extra";
 
 // =============================================================================
 // CATALOGUE « Mieux que le Loto »
 // -----------------------------------------------------------------------------
 // Chaque entrée = une activité avec sa probabilité honnête de rendre millionnaire.
 // `oddsDenominator` = « 1 chance sur N ». Sources publiques citées quand possible,
-// sinon `estimate: true` + estimation argumentée. Les `spinFactors` activent
-// l'expander (lib/expander.ts) qui génère des dizaines de variantes par entrée.
+// sinon `estimate: true` + estimation argumentée. Le champ `axes` active
+// l'expander (lib/expander.ts) qui module la proba selon le lieu, la
+// spécialisation, l'échelle, le format et le stade — voir CATALOG.md.
 //
 // Pour ajouter une entrée : voir CATALOG.md.
 // =============================================================================
 
-export const CATALOG: CatalogEntry[] = [
+const CATALOG_CORE: CatalogEntry[] = [
   // ---------------------------------------------------------------------------
   // HASARD / JEUX
   // ---------------------------------------------------------------------------
@@ -119,7 +121,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "investissement",
     source: "Rendement historique ~7%/an réel ; effort d'épargne régulier sur 30 ans",
     estimate: true,
-    spinFactors: ["echelle"],
+    axes: ["echelle"],
   },
   {
     id: "immobilier-france-10ans",
@@ -130,7 +132,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "investissement",
     source: "Notaires de France — appréciation moyenne + effet levier crédit",
     estimate: true,
-    spinFactors: ["lieu", "echelle"],
+    axes: ["lieu", "echelle"],
   },
   {
     id: "crypto-holder-10ans",
@@ -140,7 +142,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 100,
     category: "investissement",
     estimate: true,
-    spinFactors: ["echelle"],
+    axes: ["echelle"],
   },
   {
     id: "trading-retail-solo",
@@ -218,7 +220,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "entrepreneuriat",
     source: "INSEE — taux de survie & rentabilité des entreprises créées",
     estimate: true,
-    spinFactors: ["specialisation", "echelle"],
+    axes: ["specialisation", "echelle"],
   },
   {
     id: "commerce-5ans",
@@ -229,7 +231,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "entrepreneuriat",
     source: "INSEE — taux de survie à 5 ans des entreprises (~60%) pondéré rentabilité",
     estimate: true,
-    spinFactors: ["lieu", "echelle"],
+    axes: ["lieu", "echelle"],
   },
   {
     id: "boulangerie",
@@ -240,7 +242,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "entrepreneuriat",
     source: "INSEE / CGAD — boulangerie-pâtisserie, survie & marge",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "restaurant",
@@ -251,7 +253,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "entrepreneuriat",
     source: "INSEE — restauration, forte mortalité à 3-5 ans",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "food-truck",
@@ -261,7 +263,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 120,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "kebab",
@@ -271,7 +273,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 60,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "bar-cafe",
@@ -281,7 +283,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 70,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "coiffeur",
@@ -291,7 +293,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 90,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "tatoueur",
@@ -301,7 +303,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 200,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "salle-sport",
@@ -311,7 +313,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 150,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "epicerie",
@@ -321,7 +323,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 80,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "fleuriste",
@@ -331,7 +333,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 130,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "franchise-mcdo",
@@ -351,7 +353,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 60,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "specialisation"],
+    axes: ["lieu", "specialisation"],
   },
   {
     id: "airbnb-host",
@@ -361,18 +363,18 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 500,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "echelle"],
+    axes: ["lieu", "echelle"],
   },
   {
     id: "artisan-batiment",
     label: "Monter une entreprise du bâtiment (artisan)",
-    keywords: ["artisan", "batiment", "btp", "plombier", "electricien", "macon", "menuisier", "renovation", "chantier", "carreleur", "peintre batiment"],
+    keywords: ["artisan", "batiment", "btp", "plombier", "electricien", "macon", "menuisier", "renovation", "chantier", "carreleur", "platrier"],
     oddsNumerator: 1,
     oddsDenominator: 100,
     category: "entrepreneuriat",
     source: "INSEE / CAPEB — artisanat du bâtiment",
     estimate: true,
-    spinFactors: ["lieu", "echelle"],
+    axes: ["lieu", "echelle"],
   },
   {
     id: "agence-immo",
@@ -382,7 +384,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 80,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
 
   // ---------------------------------------------------------------------------
@@ -406,7 +408,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 1_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "saas-solo",
@@ -416,7 +418,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 200,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation", "echelle"],
+    axes: ["specialisation", "echelle"],
   },
   {
     id: "appli-mobile",
@@ -426,7 +428,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 5_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "ecommerce",
@@ -436,7 +438,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 300,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation", "canal"],
+    axes: ["specialisation", "format"],
   },
   {
     id: "dropshipping",
@@ -464,7 +466,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 150,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation", "echelle"],
+    axes: ["specialisation", "echelle"],
   },
   {
     id: "freelance-tech",
@@ -474,7 +476,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 400,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "startup-ia",
@@ -484,7 +486,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 3_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "biotech",
@@ -507,7 +509,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 300,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "youtube-top1000",
@@ -526,7 +528,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 100_000,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "tiktok-partenaire",
@@ -536,7 +538,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 10_000,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "instagram-1m",
@@ -546,7 +548,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 100_000,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "blog-rentable",
@@ -556,7 +558,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 1_000,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation", "canal"],
+    axes: ["specialisation", "format"],
   },
   {
     id: "podcast-top",
@@ -566,7 +568,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 100_000,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "onlyfans-top1",
@@ -585,7 +587,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 2_000,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "formateur-en-ligne",
@@ -595,7 +597,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 1_500,
     category: "createur",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "streamer-jeu",
@@ -618,7 +620,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 40_000,
     category: "artiste",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "musicien-major",
@@ -628,7 +630,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 50_000,
     category: "artiste",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "dj-international",
@@ -683,7 +685,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 3_000,
     category: "artiste",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "illustrateur",
@@ -819,7 +821,7 @@ export const CATALOG: CatalogEntry[] = [
     category: "metier",
     source: "Honoraires moyens + patrimoine constitué sur carrière (estimation)",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "avocat-associe",
@@ -829,7 +831,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 500,
     category: "metier",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "notaire",
@@ -893,7 +895,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 800,
     category: "metier",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "expert-comptable",
@@ -1028,7 +1030,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 1_500,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation", "canal"],
+    axes: ["specialisation", "format"],
   },
   {
     id: "coach-dev-perso",
@@ -1047,7 +1049,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 5_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["canal"],
+    axes: ["format"],
   },
   {
     id: "chaine-restauration",
@@ -1066,7 +1068,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 200,
     category: "metier",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "viticulteur",
@@ -1076,7 +1078,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 1_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "auto-ecole",
@@ -1086,7 +1088,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 200,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "garage-auto",
@@ -1096,7 +1098,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 150,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "pressing-laverie",
@@ -1106,7 +1108,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 120,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "nounou-creche",
@@ -1116,7 +1118,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 300,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "infirmier-liberal",
@@ -1153,7 +1155,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 8_000,
     category: "metier",
     estimate: true,
-    spinFactors: ["echelle"],
+    axes: ["echelle"],
   },
   {
     id: "transport-logistique",
@@ -1163,7 +1165,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 250,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["echelle"],
+    axes: ["echelle"],
   },
   {
     id: "menage-services",
@@ -1173,7 +1175,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 400,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu", "echelle"],
+    axes: ["lieu", "echelle"],
   },
   {
     id: "jardinier-paysagiste",
@@ -1183,7 +1185,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 600,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "developpeur-jeux",
@@ -1256,7 +1258,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 100,
     category: "investissement",
     estimate: true,
-    spinFactors: ["echelle"],
+    axes: ["echelle"],
   },
   {
     id: "marchand-de-biens",
@@ -1275,7 +1277,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 5_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["canal"],
+    axes: ["format"],
   },
   {
     id: "createur-cosmetique",
@@ -1285,7 +1287,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 4_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["canal"],
+    axes: ["format"],
   },
   {
     id: "brasseur-biere",
@@ -1295,7 +1297,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 800,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "torréfacteur-cafe",
@@ -1305,7 +1307,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 600,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "glacier",
@@ -1315,7 +1317,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 400,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "chocolatier",
@@ -1325,7 +1327,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 700,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "traiteur",
@@ -1335,7 +1337,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 500,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "wedding-planner",
@@ -1381,7 +1383,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 6_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["specialisation"],
+    axes: ["specialisation"],
   },
   {
     id: "plateforme-marketplace",
@@ -1418,7 +1420,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 200,
     category: "investissement",
     estimate: true,
-    spinFactors: ["echelle"],
+    axes: ["echelle"],
   },
   {
     id: "trader-options",
@@ -1626,7 +1628,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 300,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "createur-hotel",
@@ -1636,7 +1638,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 250,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "createur-discotheque",
@@ -1646,7 +1648,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 500,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "createur-salle-jeux",
@@ -1656,7 +1658,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 400,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "createur-spa",
@@ -1666,7 +1668,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 350,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["lieu"],
+    axes: ["lieu"],
   },
   {
     id: "createur-pharma-veg",
@@ -1676,7 +1678,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 4_000,
     category: "entrepreneuriat",
     estimate: true,
-    spinFactors: ["canal"],
+    axes: ["format"],
   },
   {
     id: "createur-app-dating",
@@ -1740,7 +1742,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 1_000,
     category: "investissement",
     estimate: true,
-    spinFactors: ["lieu", "echelle"],
+    axes: ["lieu", "echelle"],
   },
   {
     id: "createur-foret",
@@ -1813,7 +1815,7 @@ export const CATALOG: CatalogEntry[] = [
     oddsDenominator: 5_000,
     category: "metier",
     estimate: true,
-    spinFactors: ["canal"],
+    axes: ["format"],
   },
   {
     id: "createur-naturopathe",
@@ -1843,3 +1845,6 @@ export const CATALOG: CatalogEntry[] = [
     estimate: true,
   },
 ];
+
+// Catalogue complet = base « cœur » + extension de couverture (scale).
+export const CATALOG: CatalogEntry[] = [...CATALOG_CORE, ...CATALOG_EXTRA];

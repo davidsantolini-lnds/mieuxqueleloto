@@ -10,8 +10,13 @@ export type Category =
   | "metier"
   | "speculatif";
 
-/** Facteurs sur lesquels l'expander génère des variations d'une entrée. */
-export type SpinFactor = "lieu" | "specialisation" | "echelle" | "canal";
+/**
+ * Axes d'expansion. Chaque entrée déclare les axes qui lui sont *cohérents*
+ * (filtre logique : une boulangerie a un lieu mais pas de « format online » ;
+ * un SaaS a un format mais pas de ville). L'expander combine ces axes pour
+ * générer, à la volée, l'espace des variantes — sans jamais le matérialiser.
+ */
+export type Axis = "lieu" | "specialisation" | "echelle" | "format" | "stage";
 
 export type CatalogEntry = {
   id: string;
@@ -28,16 +33,8 @@ export type CatalogEntry = {
   source?: string;
   /** true si la proba est une estimation honnête plutôt qu'une donnée sourcée. */
   estimate?: boolean;
-  /** Facteurs d'expansion (lieu, spécialisation…) pour générer des variantes. */
-  spinFactors?: SpinFactor[];
-};
-
-/** Une entrée du catalogue après expansion (variante générée). */
-export type ExpandedEntry = CatalogEntry & {
-  /** id de l'entrée de base dont dérive cette variante. */
-  baseId: string;
-  /** Étiquettes des modulateurs appliqués, ex: ["à Paris", "en niche"]. */
-  modifiers: string[];
+  /** Axes d'expansion cohérents avec cette activité. */
+  axes?: Axis[];
 };
 
 export const LOTO_DENOMINATOR = 19_068_840; // 1 chance sur 19 068 840 — FDJ Loto
@@ -50,13 +47,13 @@ export type MatchResult = {
   denominator: number;
   /** Combien de fois plus (ou moins) de chances qu'au Loto. >1 = mieux. */
   ratioVsLoto: number;
-  /** Libellé de l'activité retenue. */
+  /** Libellé de l'activité retenue (modulateurs inclus). */
   label: string;
   category: Category | null;
   quality: MatchQuality;
   source?: string;
   estimate?: boolean;
-  /** Score de matching brut (Jaccard pondéré), pour debug. */
+  /** Score de matching brut (overlap pondéré), pour debug. */
   score: number;
   /** Phrase prête à afficher (peut être de la mauvaise foi). */
   message: string;
@@ -64,4 +61,6 @@ export type MatchResult = {
   badFaith: boolean;
   /** Disclaimer optionnel (match faible). */
   disclaimer?: string;
+  /** Étiquettes des modulateurs appliqués, ex: ["à Paris", "en franchise"]. */
+  modifiers?: string[];
 };

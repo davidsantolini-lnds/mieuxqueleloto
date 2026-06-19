@@ -1,19 +1,21 @@
 import Comparator from "@/components/Comparator";
-import { CATALOG } from "@/lib/catalog";
-import { expandedCount } from "@/lib/expander";
+import { BASE_COUNT, effectiveCount } from "@/lib/expander";
 
 const LOTO_PRETTY = (19_068_840).toLocaleString("fr-FR");
+// Compteur calculé dynamiquement depuis l'espace combinatoire de l'expander.
+const EFFECTIVE = effectiveCount();
+const EFFECTIVE_PRETTY = EFFECTIVE.toLocaleString("fr-FR");
 
 export default function Home() {
-  const baseCount = CATALOG.length;
-  const effective = expandedCount();
+  const baseCount = BASE_COUNT;
+  const effective = EFFECTIVE;
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 pb-28 pt-12 md:pt-20">
       {/* Hero */}
       <section className="animate-fade-up w-full max-w-2xl text-center">
         <span className="inline-block rounded-full border border-ink/10 bg-white/50 px-4 py-1.5 text-xs font-semibold tracking-wide text-muted">
-          🎰 La calculette anti-Loto
+          🎰 {EFFECTIVE_PRETTY} activités comparées
         </span>
 
         <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
@@ -40,9 +42,11 @@ export default function Home() {
       {/* Footer minimal */}
       <footer className="mt-auto w-full max-w-2xl px-2 pt-16 text-center text-xs text-muted">
         <p>
-          {baseCount} activités de base, ~{effective.toLocaleString("fr-FR")}{" "}
-          combinaisons calculées. Probabilités sourcées ou estimées honnêtement
-          — à prendre avec humour, pas comme un conseil financier.
+          {baseCount} activités de base hand-curatées, étendues à{" "}
+          {effective.toLocaleString("fr-FR")} combinaisons générées à la volée
+          (lieu, spécialisation, échelle, format, stade). Probabilités sourcées
+          ou estimées honnêtement — à prendre avec humour, pas comme un conseil
+          financier.
         </p>
         <p className="mt-2">
           Fait avec 🎰 pour rappeler qu'à peu près tout est mieux que le Loto.
