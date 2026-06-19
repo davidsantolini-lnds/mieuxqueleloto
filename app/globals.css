@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+   Thème « Mieux que le Loto » — gradient Parknest (pêche → rose → violet)
+   ======================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cream: #fff7f2;
+  --peach: #ff9f7a;
+  --pink: #ff5fb1;
+  --violet: #3e1fb0;
+  --ink: #1c1130;
+  --muted: #6b5b78;
+  --card: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(255, 255, 255, 0.7);
+  --brand-gradient: linear-gradient(135deg, #ff9f7a 0%, #ff5fb1 55%, #3e1fb0 100%);
+  --soft-gradient: linear-gradient(165deg, #fff4ef 0%, #fdeef3 48%, #f1ecfb 100%);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: var(--cream);
+  --color-peach: var(--peach);
+  --color-pink: var(--pink);
+  --color-violet: var(--violet);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--soft-gradient);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Texte en dégradé de marque */
+.brand-text {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.brand-bg {
+  background: var(--brand-gradient);
+}
+
+/* Carte glassmorphism */
+.glass {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 20px 60px -20px rgba(62, 31, 176, 0.25);
+}
+
+/* Animations spring légères au reveal */
+@keyframes reveal-spring {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  60% {
+    transform: translateY(-3px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-reveal {
+  animation: reveal-spring 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease both;
+}
+
+/* Barre de progression remplissage animé */
+@keyframes grow-bar {
+  from {
+    width: 0%;
+  }
+}
+
+.animate-bar {
+  animation: grow-bar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-reveal,
+  .animate-fade-up,
+  .animate-bar {
+    animation: none;
+  }
 }

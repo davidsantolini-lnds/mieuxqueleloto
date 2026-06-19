@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Pensez à ajouter votre Sitemap une fois le domaine câblé :
+# Sitemap: https://mieuxqueleloto.fr/sitemap.xml
