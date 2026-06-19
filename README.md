@@ -22,7 +22,7 @@ instantanément avec **ta probabilité de devenir millionnaire**, comparée au
 | ------------- | ------------------------------------------------ |
 | Framework     | Next.js 16 (App Router, `output: 'export'`)      |
 | Langage       | TypeScript                                       |
-| Style         | Tailwind CSS v4 (gradient Parknest pêche→violet) |
+| Style         | Tailwind CSS v4 (gradient pêche → violet)        |
 | Tests         | Vitest                                           |
 | Déploiement   | Vercel (statique)                                |
 
