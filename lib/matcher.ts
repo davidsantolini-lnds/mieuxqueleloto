@@ -38,6 +38,7 @@ const STOP_WORDS = new Set([
 const GENERIC_WEIGHT_WORDS = new Set([
   "ouvrir", "lancer", "creer", "monter", "devenir", "faire", "gagner", "vivre",
   "tenir", "obtenir", "reussir", "trouver", "arriver", "garder",
+  "jouer", "finir", "comprendre", "expliquer",
   "etre", "avoir", "tenter", "essayer", "idee", "projet", "activite", "travail",
   "job", "metier", "argent", "riche", "millionnaire", "million", "fortune",
   "reussir", "percer", "gens", "vendre", "carriere", "profession",

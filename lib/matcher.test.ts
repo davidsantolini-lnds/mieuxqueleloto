@@ -307,6 +307,37 @@ describe("matching — registre absurde / quotidien", () => {
     expect(matched("pizza ananas").category).toBe("absurde"));
   it("comprendre la TVA → absurde", () =>
     expect(matched("comprendre la tva").category).toBe("absurde"));
+
+  // Nouvelle vague « trucs débiles »
+  it("lécher son coude → absurde", () =>
+    expect(matched("lécher son coude").category).toBe("absurde"));
+  it("marcher sur un Lego → absurde", () =>
+    expect(matched("marcher sur un lego").category).toBe("absurde"));
+  it("diviser par zéro → absurde", () =>
+    expect(matched("diviser par zéro").category).toBe("absurde"));
+  it("gagner un débat sur internet → absurde", () =>
+    expect(matched("gagner un débat sur internet").category).toBe("absurde"));
+  it("pousser une porte « tirez » → absurde", () =>
+    expect(matched("pousser la porte tirez").category).toBe("absurde"));
+  it("résoudre un Rubik's Cube → absurde", () =>
+    expect(matched("résoudre un rubiks cube").category).toBe("absurde"));
+  it("finir un Monopoly → absurde", () =>
+    expect(matched("finir une partie de monopoly").category).toBe("absurde"));
+  it("retourner une crêpe → absurde", () =>
+    expect(matched("retourner une crêpe en l'air").category).toBe("absurde"));
+  it("que le chat vienne quand on l'appelle → absurde", () =>
+    expect(matched("que le chat vienne quand on l'appelle").category).toBe("absurde"));
+  it("comprendre les règles du cricket → absurde", () =>
+    expect(matched("comprendre les règles du cricket").category).toBe("absurde"));
+  it("rattraper son téléphone qui tombe → absurde", () =>
+    expect(matched("rattraper son téléphone qui tombe").category).toBe("absurde"));
+  it("prendre le métro dans le bon sens → absurde", () =>
+    expect(matched("prendre le métro dans le bon sens").category).toBe("absurde"));
+
+  it("le sérieux garde la priorité : jouer au loto reste du hasard", () => {
+    expect(match("jouer au loto", o).category).toBe("hasard");
+    expect(match("jouer en nba", o).category).toBe("sport");
+  });
 });
 
 describe("mauvaise foi", () => {
