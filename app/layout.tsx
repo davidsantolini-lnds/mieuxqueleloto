@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import BottomAdBar from "@/components/ads/BottomAdBar";
 
@@ -65,6 +66,7 @@ export default function RootLayout({
         )}
         <div className="flex flex-1 flex-col">{children}</div>
         <BottomAdBar />
+        <Analytics />
       </body>
     </html>
   );
