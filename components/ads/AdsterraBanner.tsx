@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CONSENT_EVENT, readConsent } from "../ConsentBanner";
 
 const BANNER_KEY = process.env.NEXT_PUBLIC_ADSTERRA_BANNER_KEY;
 
@@ -11,16 +12,25 @@ type Props = {
 };
 
 /**
- * Bannière Adsterra. Ne s'affiche que si NEXT_PUBLIC_ADSTERRA_BANNER_KEY est défini.
+ * Bannière Adsterra. Ne s'affiche que si NEXT_PUBLIC_ADSTERRA_BANNER_KEY est défini
+ * ET que l'utilisateur a explicitement consenti aux cookies publicitaires (RGPD).
  * Adsterra fonctionne en injectant `atOptions` puis un script `invoke.js` propre
  * à la zone. On le fait dans un conteneur isolé pour éviter les collisions.
  */
 export default function AdsterraBanner({ width = 728, height = 90, className }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const injected = useRef(false);
+  const [granted, setGranted] = useState(false);
 
   useEffect(() => {
-    if (!BANNER_KEY || injected.current || !containerRef.current) return;
+    const sync = () => setGranted(readConsent() === "granted");
+    sync();
+    window.addEventListener(CONSENT_EVENT, sync);
+    return () => window.removeEventListener(CONSENT_EVENT, sync);
+  }, []);
+
+  useEffect(() => {
+    if (!BANNER_KEY || !granted || injected.current || !containerRef.current) return;
     injected.current = true;
 
     const conf = document.createElement("script");
@@ -34,7 +44,7 @@ export default function AdsterraBanner({ width = 728, height = 90, className }: 
 
     containerRef.current.appendChild(conf);
     containerRef.current.appendChild(invoke);
-  }, [width, height]);
+  }, [width, height, granted]);
 
   if (!BANNER_KEY) return null;
 
