@@ -42,6 +42,11 @@ export const metadata: Metadata = {
     description:
       "Tes vraies chances de devenir millionnaire, comparées à l'EuroMillions.",
   },
+  other: {
+    // Vérification de propriété Google AdSense (meta tag « silencieuse » :
+    // n'injecte aucun script ni cookie, donc compatible avec notre flux RGPD).
+    "google-adsense-account": "ca-pub-2157892055744424",
+  },
 };
 
 export const viewport: Viewport = {
