@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Mentions légales & confidentialité — Mieux que le Loto ?",
   description:
     "Mentions légales, politique de confidentialité et gestion des cookies du site Mieux que le Loto ?",
+  alternates: { canonical: "/legal" },
   robots: { index: true, follow: false },
 };
 

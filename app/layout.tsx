@@ -13,10 +13,12 @@ const inter = Inter({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mieuxqueleloto.fr";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mieuxqueleloto.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: "Mieux que le Loto ? — Tes vraies chances de devenir millionnaire",
   description:
     "Tape une activité. On calcule tes chances de devenir millionnaire et on les compare à l'EuroMillions (1 chance sur 139 838 160). Spoiler : tout est mieux que l'EuroMillions.",
