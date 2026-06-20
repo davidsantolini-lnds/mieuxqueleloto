@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import BottomAdBar from "@/components/ads/BottomAdBar";
+import AdSenseScript from "@/components/ads/AdSenseScript";
+import ConsentBanner from "@/components/ConsentBanner";
+import SiteFooter from "@/components/SiteFooter";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
-
-const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mieuxqueleloto.fr";
 
@@ -55,17 +55,13 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
-        {ADSENSE_CLIENT_ID && (
-          <Script
-            id="adsbygoogle-init"
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
-        <div className="flex flex-1 flex-col">{children}</div>
+        <AdSenseScript />
+        <div className="flex flex-1 flex-col">
+          {children}
+          <SiteFooter />
+        </div>
         <BottomAdBar />
+        <ConsentBanner />
         <Analytics />
       </body>
     </html>

@@ -35,11 +35,6 @@ export default function Home() {
       <section className="mt-5 w-full sm:mt-8">
         <Comparator />
       </section>
-
-      {/* Footer ultra-minimal — aucun détail sur le fonctionnement interne. */}
-      <footer className="mt-auto w-full px-2 pt-10 text-center text-[11px] text-muted/70 sm:pt-16">
-        © 2026 — Mieux que le Loto&nbsp;?
-      </footer>
     </main>
   );
 }
