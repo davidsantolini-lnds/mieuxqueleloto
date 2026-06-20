@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Site 100% statique : matching et catalogue bundlés côté client, zéro API.
-  output: "export",
+  // Pas d'`output: export` : on a besoin d'une route serverless pour la
+  // génération d'images OG dynamiques (cf. app/api/og/route.tsx).
+  // Le reste des pages reste pré-rendu statiquement par Next (SSG) —
+  // coût Vercel ~nul.
   images: {
     unoptimized: true,
   },

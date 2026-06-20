@@ -1,10 +1,52 @@
+import type { Metadata } from "next";
 import Comparator from "@/components/Comparator";
 import { effectiveCount } from "@/lib/expander";
+import { match } from "@/lib/matcher";
+import { formatOdds } from "@/lib/format";
 import { BASELINE_DENOMINATOR } from "@/lib/types";
 
 const BASELINE_PRETTY = BASELINE_DENOMINATOR.toLocaleString("fr-FR");
 // Compteur calculé dynamiquement depuis l'espace combinatoire de l'expander.
 const EFFECTIVE_PRETTY = effectiveCount().toLocaleString("fr-FR");
+
+/**
+ * Quand un visiteur partage `/?q=...`, on calcule le match côté serveur et on
+ * pousse une preview OpenGraph dynamique (image générée par /api/og). Sans
+ * `?q`, on retombe sur la metadata par défaut de app/layout.tsx.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}): Promise<Metadata> {
+  const { q } = await searchParams;
+  if (!q) return {};
+
+  const result = match(q);
+  if (result.quality === "poetic") return {};
+
+  const ogUrl = `/api/og?n=${result.denominator}&r=${result.ratioVsLoto}&l=${encodeURIComponent(result.label)}`;
+  const title = `${formatOdds(result.denominator)} — ${result.label}`;
+  const description = `${formatOdds(result.denominator)} de devenir millionnaire en « ${result.label} ». Comparé à l'EuroMillions sur mieuxqueleloto.fr.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      type: "website",
+      locale: "fr_FR",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogUrl],
+    },
+  };
+}
 
 export default function Home() {
   return (
