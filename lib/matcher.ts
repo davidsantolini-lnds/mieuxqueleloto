@@ -7,7 +7,6 @@ import {
   CATEGORY_FALLBACK_LABEL,
   randomPoetic,
 } from "./fallback";
-import { generateBadFaith, shouldBeBadFaith } from "./badFaith";
 import { formatOdds, formatRatio } from "./format";
 
 export { formatOdds, formatRatio } from "./format";
@@ -22,7 +21,7 @@ export { formatOdds, formatRatio } from "./format";
 //   3. Détecte les modulateurs (lieu / spécialisation / échelle / format /
 //      stade) présents dans la requête, cohérents avec l'entrée, et les
 //      applique → variante générée à la volée.
-//   4. Seuils + fallbacks (classifier de catégorie, poétique) + mauvaise foi.
+//   4. Seuils + fallbacks (classifier de catégorie, poétique).
 // =============================================================================
 
 const STOP_WORDS = new Set([
@@ -295,12 +294,9 @@ function geometricMeanDenominator(category: Category): number {
 const STRONG_THRESHOLD = 0.3;
 const WEAK_THRESHOLD = 0.15;
 
-export type MatchOptions = {
-  /** Désactive la mauvaise foi (tests, debug). */
-  disableBadFaith?: boolean;
-};
+export type MatchOptions = Record<string, never>;
 
-export function match(input: string, opts: MatchOptions = {}): MatchResult {
+export function match(input: string, _opts: MatchOptions = {}): MatchResult {
   const tokens = tokenize(input);
   const inputNorm = normalize(input);
 
@@ -342,7 +338,7 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
     const ratioVsLoto = BASELINE_DENOMINATOR / denominator;
     const quality = bestScore >= STRONG_THRESHOLD ? "strong" : "weak";
 
-    return finalize({
+    return {
       denominator,
       ratioVsLoto,
       label,
@@ -351,13 +347,9 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
       source: entry.source,
       estimate: entry.estimate,
       score: bestScore,
+      message: `${formatOdds(denominator)}. Soit ${formatRatio(ratioVsLoto)}.`,
       modifiers: labels,
-      disclaimer:
-        quality === "weak"
-          ? "Match approximatif — on a fait au mieux avec ce que tu as tapé."
-          : undefined,
-      opts,
-    });
+    };
   }
 
   // Fallback catégorie via classifier de mots.
@@ -365,7 +357,7 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
   if (category) {
     const denominator = geometricMeanDenominator(category);
     const ratioVsLoto = BASELINE_DENOMINATOR / denominator;
-    return finalize({
+    return {
       denominator,
       ratioVsLoto,
       label: CATEGORY_FALLBACK_LABEL[category],
@@ -373,10 +365,8 @@ export function match(input: string, opts: MatchOptions = {}): MatchResult {
       quality: "category",
       score: bestScore,
       estimate: true,
-      disclaimer:
-        "Pas d'entrée précise, mais on a deviné la famille d'activité — estimation large.",
-      opts,
-    });
+      message: `${formatOdds(denominator)}. Soit ${formatRatio(ratioVsLoto)}.`,
+    };
   }
 
   return poeticResult();
@@ -391,56 +381,5 @@ function poeticResult(): MatchResult {
     quality: "poetic",
     score: 0,
     message: randomPoetic(),
-    badFaith: false,
-  };
-}
-
-function finalize(args: {
-  denominator: number;
-  ratioVsLoto: number;
-  label: string;
-  category: Category;
-  quality: "strong" | "weak" | "category";
-  source?: string;
-  estimate?: boolean;
-  score: number;
-  disclaimer?: string;
-  modifiers?: string[];
-  opts: MatchOptions;
-}): MatchResult {
-  const { denominator, ratioVsLoto } = args;
-
-  if (!args.opts.disableBadFaith && shouldBeBadFaith()) {
-    const bf = generateBadFaith({ label: args.label, denominator, ratioVsLoto });
-    return {
-      denominator,
-      ratioVsLoto,
-      label: args.label,
-      category: args.category,
-      quality: args.quality,
-      source: args.source,
-      estimate: args.estimate,
-      score: args.score,
-      message: bf.text,
-      badFaith: true,
-      disclaimer: args.disclaimer,
-      modifiers: args.modifiers,
-    };
-  }
-
-  const message = `${formatOdds(denominator)}. Soit ${formatRatio(ratioVsLoto)}.`;
-  return {
-    denominator,
-    ratioVsLoto,
-    label: args.label,
-    category: args.category,
-    quality: args.quality,
-    source: args.source,
-    estimate: args.estimate,
-    score: args.score,
-    message,
-    badFaith: false,
-    disclaimer: args.disclaimer,
-    modifiers: args.modifiers,
   };
 }

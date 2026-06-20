@@ -3,12 +3,11 @@ import { match, normalize, tokenize } from "./matcher";
 import { CATALOG } from "./catalog";
 import { BASE_COUNT, effectiveCount, axisCardinality } from "./expander";
 
-// Mauvaise foi désactivée pour des tests déterministes sur le matching.
-const o = { disableBadFaith: true };
+const o = {};
 
 // Helper : matche et exige une catégorie précise.
 function cat(q: string) {
-  return match(q, o).category;
+  return match(q).category;
 }
 
 describe("normalize / tokenize", () => {
@@ -234,7 +233,6 @@ describe("fallbacks", () => {
   it("input vide → fallback poétique", () => {
     const r = match("", o);
     expect(r.quality).toBe("poetic");
-    expect(r.badFaith).toBe(false);
   });
   it("classifier : « monter un business » → entrepreneuriat", () => {
     expect(cat("monter un business quelconque truc")).toBe("entrepreneuriat");
@@ -408,24 +406,6 @@ describe("axes du registre absurde (modulateurs contextuels)", () => {
     // « en réunion » ne doit pas moduler une activité sérieuse comme la boulangerie.
     const r = match("ouvrir une boulangerie en réunion", o);
     expect(r.label.toLowerCase()).not.toContain("réunion");
-  });
-});
-
-describe("mauvaise foi", () => {
-  it("apparaît parfois sur plusieurs tirages", () => {
-    let seen = false;
-    for (let i = 0; i < 200; i++) {
-      if (match("ouvrir une boulangerie").badFaith) {
-        seen = true;
-        break;
-      }
-    }
-    expect(seen).toBe(true);
-  });
-  it("jamais quand désactivée", () => {
-    for (let i = 0; i < 50; i++) {
-      expect(match("ouvrir une boulangerie", o).badFaith).toBe(false);
-    }
   });
 });
 

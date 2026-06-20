@@ -31,9 +31,6 @@ export default function ResultCard({
   const isPoetic = result.quality === "poetic";
   const fill = logFill(result.denominator);
   const better = result.ratioVsLoto >= 1;
-  // On ne montre du texte que pour la mauvaise foi ou le fallback poétique :
-  // un résultat normal s'ouvre directement sur les chiffres (effet « magique »).
-  const showMessage = result.badFaith || isPoetic;
 
   return (
     <div className="animate-reveal glass mx-auto mt-8 w-full max-w-xl rounded-3xl p-6 md:p-8">
@@ -52,16 +49,10 @@ export default function ResultCard({
         </div>
       )}
 
-      {showMessage && (
+      {isPoetic && (
         <p className="mt-4 text-base leading-relaxed text-ink/90">
           {result.message}
         </p>
-      )}
-
-      {result.badFaith && (
-        <span className="mt-2 inline-block rounded-full bg-pink/15 px-3 py-1 text-xs font-semibold text-pink">
-          🤥 réponse de mauvaise foi
-        </span>
       )}
 
       {/* Barre log : ton activité vs Loto + MyMillion */}

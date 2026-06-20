@@ -73,12 +73,8 @@ export type MatchResult = {
   estimate?: boolean;
   /** Score de matching brut (overlap pondéré), pour debug. */
   score: number;
-  /** Phrase prête à afficher (peut être de la mauvaise foi). */
+  /** Phrase prête à afficher (utilisée uniquement pour le fallback poétique). */
   message: string;
-  /** true si la réponse a été remplacée par une punchline de mauvaise foi. */
-  badFaith: boolean;
-  /** Disclaimer optionnel (match faible). */
-  disclaimer?: string;
   /** Étiquettes des modulateurs appliqués, ex: ["à Paris", "en franchise"]. */
   modifiers?: string[];
 };
