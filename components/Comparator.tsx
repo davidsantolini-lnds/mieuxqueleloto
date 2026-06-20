@@ -19,15 +19,6 @@ const PLACEHOLDERS = [
   "ouvrir un kebab",
 ];
 
-const EXAMPLES = [
-  "Ouvrir une boulangerie",
-  "Devenir streamer",
-  "Lancer un SaaS",
-  "Investir en immobilier",
-  "Devenir influenceur",
-  "Gagner Roland-Garros",
-];
-
 export default function Comparator() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<MatchResult | null>(null);
@@ -108,22 +99,6 @@ export default function Comparator() {
           </button>
         </div>
       </form>
-
-      {/* Exemples cliquables — compacts, 2 lignes max sur mobile */}
-      <div className="mx-auto mt-3 flex max-w-xl flex-wrap justify-center gap-1.5">
-        {EXAMPLES.map((ex) => (
-          <button
-            key={ex}
-            onClick={() => {
-              setQuery(ex);
-              run(ex);
-            }}
-            className="rounded-full border border-ink/10 bg-white/50 px-2.5 py-1 text-xs text-muted transition hover:bg-white/80 hover:text-ink sm:text-sm"
-          >
-            {ex}
-          </button>
-        ))}
-      </div>
 
       {result && <ResultCard result={result} query={submitted} />}
     </div>
