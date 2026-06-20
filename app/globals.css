@@ -1,27 +1,32 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   Thème « Mieux que le Loto » — gradient de marque (pêche → rose → violet)
+   Thème « Mieux que le Loto » — inspiré FDJ / EuroMillions
+   (sans copie : bleu nuit + or étoilé + accent rouge jackpot)
    ======================================================================== */
 
 :root {
-  --cream: #fff7f2;
-  --peach: #ff9f7a;
-  --pink: #ff5fb1;
-  --violet: #3e1fb0;
-  --ink: #1c1130;
-  --muted: #6b5b78;
-  --card: rgba(255, 255, 255, 0.6);
-  --card-border: rgba(255, 255, 255, 0.7);
-  --brand-gradient: linear-gradient(135deg, #ff9f7a 0%, #ff5fb1 55%, #3e1fb0 100%);
-  --soft-gradient: linear-gradient(165deg, #fff4ef 0%, #fdeef3 48%, #f1ecfb 100%);
+  --bg-cream: #fafbff;
+  --gold: #f5c518;        /* étoile EuroMillions */
+  --orange: #ff7a00;
+  --red: #e2001a;         /* rouge FDJ */
+  --blue-deep: #0a1f60;   /* bleu nuit EuroMillions */
+  --blue-night: #061344;
+  --ink: #0a1f60;
+  --muted: #5c6a8a;
+  --card: rgba(255, 255, 255, 0.72);
+  --card-border: rgba(255, 255, 255, 0.85);
+  --brand-gradient: linear-gradient(135deg, #f5c518 0%, #ff7a00 55%, #e2001a 100%);
+  --soft-gradient: linear-gradient(165deg, #fafbff 0%, #eef2ff 45%, #fff6dc 100%);
 }
 
 @theme inline {
-  --color-cream: var(--cream);
-  --color-peach: var(--peach);
-  --color-pink: var(--pink);
-  --color-violet: var(--violet);
+  --color-cream: var(--bg-cream);
+  --color-gold: var(--gold);
+  --color-orange: var(--orange);
+  --color-red: var(--red);
+  --color-blue-deep: var(--blue-deep);
+  --color-blue-night: var(--blue-night);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -39,7 +44,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Texte en dégradé de marque */
+/* Texte en dégradé de marque (or → rouge jackpot) */
 .brand-text {
   background: var(--brand-gradient);
   -webkit-background-clip: text;
@@ -52,13 +57,13 @@ body {
   background: var(--brand-gradient);
 }
 
-/* Carte glassmorphism */
+/* Carte glassmorphism avec ombre bleu nuit */
 .glass {
   background: var(--card);
   border: 1px solid var(--card-border);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: 0 20px 60px -20px rgba(62, 31, 176, 0.25);
+  box-shadow: 0 20px 60px -20px rgba(10, 31, 96, 0.28);
 }
 
 /* Animations spring légères au reveal */

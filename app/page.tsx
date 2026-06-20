@@ -15,15 +15,15 @@ export default function Home() {
           🎰 {EFFECTIVE_PRETTY} activités comparées
         </span>
 
-        <h1 className="mt-3 text-[2rem] font-extrabold leading-[1.06] tracking-tight sm:mt-5 sm:text-4xl md:text-6xl">
+        <h1 className="mt-3 text-[1.75rem] font-extrabold leading-[1.08] tracking-tight sm:mt-5 sm:text-4xl md:text-6xl">
           Vaut mieux faire <span className="brand-text">ça</span>
-          <br className="hidden sm:block" /> ou jouer au Loto ?
+          <br /> ou gagner à l&apos;EuroMillions&nbsp;?
         </h1>
 
         <p className="mx-auto mt-3 max-w-lg text-base text-muted sm:mt-5 sm:text-lg">
           Tape une activité. On calcule tes vraies chances de devenir{" "}
           <strong className="text-ink">millionnaire</strong>, et on les compare
-          au Loto + MyMillion&nbsp;
+          à l&apos;EuroMillions&nbsp;
           <span className="whitespace-nowrap">
             (1 chance sur {BASELINE_PRETTY})
           </span>

@@ -55,7 +55,7 @@ export default function ResultCard({
         </p>
       )}
 
-      {/* Barre log : ton activité vs Loto + MyMillion */}
+      {/* Barre log : ton activité vs EuroMillions */}
       {!isPoetic && (
         <div className="mt-6">
           <div className="relative h-4 w-full overflow-hidden rounded-full bg-ink/10">
@@ -63,16 +63,16 @@ export default function ResultCard({
               className="animate-bar brand-bg h-full rounded-full"
               style={{ width: `${fill}%` }}
             />
-            {/* Repère Loto + MyMillion */}
+            {/* Repère EuroMillions */}
             <div
               className="absolute top-1/2 h-5 w-[3px] -translate-y-1/2 rounded bg-ink/60"
               style={{ left: `calc(${baselineFill}% - 1.5px)` }}
-              title="Niveau du Loto + MyMillion"
+              title="Niveau de l'EuroMillions"
             />
           </div>
           <div className="mt-1 flex justify-between text-[11px] text-muted">
             <span>impossible</span>
-            <span>↑ Loto + MyMillion</span>
+            <span>↑ EuroMillions</span>
             <span>quasi sûr</span>
           </div>
         </div>

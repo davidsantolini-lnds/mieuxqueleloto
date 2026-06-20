@@ -10,9 +10,9 @@ export function formatOdds(denominator: number): string {
 }
 
 export function formatRatio(ratio: number): string {
-  // `ratio` = chances comparées au baseline Loto + MyMillion.
+  // `ratio` = chances comparées au baseline EuroMillions.
   if (ratio >= 1) {
-    return `${Math.round(ratio).toLocaleString("fr-FR")}× plus de chances qu'au Loto + MyMillion`;
+    return `${Math.round(ratio).toLocaleString("fr-FR")}× plus de chances qu'à l'EuroMillions`;
   }
-  return `${Math.round(1 / ratio).toLocaleString("fr-FR")}× moins de chances qu'au Loto + MyMillion`;
+  return `${Math.round(1 / ratio).toLocaleString("fr-FR")}× moins de chances qu'à l'EuroMillions`;
 }

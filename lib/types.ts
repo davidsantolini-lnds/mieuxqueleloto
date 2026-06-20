@@ -51,19 +51,16 @@ export const LOTO_DENOMINATOR = 19_068_840; // 1 chance sur 19 068 840 — FDJ L
 export const EUROMILLIONS_DENOMINATOR = 139_838_160; // 1 chance — EuroMillions
 export const MYMILLION_DENOMINATOR = 5_000_000; // 1 chance — code MyMillion (FDJ)
 
-// Nouveau baseline de comparaison : Loto OU MyMillion (les deux à la fois).
-// 1 / (1/19068840 + 1/5000000) ≈ 1 chance sur 3 961 313.
-export const BASELINE_DENOMINATOR = Math.round(
-  1 / (1 / LOTO_DENOMINATOR + 1 / MYMILLION_DENOMINATOR),
-);
-export const BASELINE_LABEL = "Loto + MyMillion";
+// Baseline de comparaison : EuroMillions (rang 1).
+export const BASELINE_DENOMINATOR = EUROMILLIONS_DENOMINATOR;
+export const BASELINE_LABEL = "EuroMillions";
 
 export type MatchQuality = "strong" | "weak" | "category" | "poetic";
 
 export type MatchResult = {
   /** Probabilité finale : 1 / denominator. */
   denominator: number;
-  /** Combien de fois plus (ou moins) de chances qu'au Loto. >1 = mieux. */
+  /** Combien de fois plus (ou moins) de chances qu'à l'EuroMillions. >1 = mieux. */
   ratioVsLoto: number;
   /** Libellé de l'activité retenue (modulateurs inclus). */
   label: string;

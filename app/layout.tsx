@@ -19,19 +19,20 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Mieux que le Loto ? — Tes vraies chances de devenir millionnaire",
   description:
-    "Tape une activité, on calcule tes chances de devenir millionnaire et on les compare au Loto (1 chance sur 19 068 840). Spoiler : tout est mieux que le Loto.",
+    "Tape une activité. On calcule tes chances de devenir millionnaire et on les compare à l'EuroMillions (1 chance sur 139 838 160). Spoiler : tout est mieux que l'EuroMillions.",
   keywords: [
+    "euromillions",
     "loto",
     "millionnaire",
     "probabilité",
     "devenir riche",
-    "comparaison loto",
+    "comparaison euromillions",
     "chances",
   ],
   openGraph: {
     title: "Mieux que le Loto ?",
     description:
-      "Tes vraies chances de devenir millionnaire, comparées au Loto. Teste ton idée.",
+      "Tes vraies chances de devenir millionnaire, comparées à l'EuroMillions. Teste ton idée.",
     type: "website",
     locale: "fr_FR",
   },
@@ -39,12 +40,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Mieux que le Loto ?",
     description:
-      "Tes vraies chances de devenir millionnaire, comparées au Loto.",
+      "Tes vraies chances de devenir millionnaire, comparées à l'EuroMillions.",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ff5fb1",
+  themeColor: "#f5c518",
   width: "device-width",
   initialScale: 1,
 };

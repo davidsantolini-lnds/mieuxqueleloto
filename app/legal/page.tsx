@@ -57,8 +57,8 @@ export default function LegalPage() {
         <p className="text-sm">
           Mieux que le Loto&nbsp;? est un site de divertissement qui compare,
           de manière humoristique mais documentée, la probabilité de devenir
-          millionnaire en pratiquant diverses activités, à celle de gagner au
-          Loto + MyMillion. Les probabilités affichées sont des estimations
+          millionnaire en pratiquant diverses activités, à celle de gagner à
+          l&apos;EuroMillions. Les probabilités affichées sont des estimations
           publiques ou raisonnées et ne constituent en aucun cas un conseil
           financier, professionnel ou patrimonial.
         </p>
